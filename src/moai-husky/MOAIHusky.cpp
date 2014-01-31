@@ -211,16 +211,18 @@ int MOAIHusky::_hasAchievements( lua_State* L ) {
 int MOAIHusky::_hasCloudSaves( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 
-	if (self->_instance != NULL) {
-		state.Push(self->_huskyCapabilities && HuskyHasCloudSaves);
-		return 1;
-	}
-
-	return 0;
+	if (self->_instance == NULL)
+		return 0;
+	
+	state.Push(self->_huskyCapabilities && HuskyHasCloudSaves);
+	return 1;
 }
 
 int MOAIHusky::_achievementReset( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "" )
+	
+	if (self->_instance == NULL)
+		return 0;
 	
 	self->_instance->resetAchievements();
 	return 0;
@@ -230,6 +232,9 @@ int MOAIHusky::_achievementReset( lua_State* L ) {
 int MOAIHusky::_achievementSet( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "US" )
 
+	if (self->_instance == NULL)
+		return 0;
+
 	cc8* name = lua_tostring ( state, 2 );
 	self->_instance->setAchievement(name);
 	return 0;
@@ -238,6 +243,9 @@ int MOAIHusky::_achievementSet( lua_State* L ) {
 int MOAIHusky::_achievementSetCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
 
+	if (self->_instance == NULL)
+		return 0;
+	
 	self->SetLocal(state, 2, self->_achievementCallback);
 	
 	return 0;
@@ -245,6 +253,9 @@ int MOAIHusky::_achievementSetCallback( lua_State* L ) {
 
 int MOAIHusky::_leaderboardUploadScore( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "USNS" )
+	
+	if (self->_instance == NULL)
+		return 0;
 	
 	cc8* name = lua_tostring ( state, 2 );
 	int32_t score = lua_tointeger( state, 3 );
@@ -274,6 +285,9 @@ int MOAIHusky::_leaderboardUploadScore( lua_State* L ) {
 int MOAIHusky::_leaderboardSetScoreCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
 	
+	if (self->_instance == NULL)
+		return 0;
+	
 	self->SetLocal(state, 2, self->_leaderboardScoreSetCallback);
 	
 	return 0;
@@ -281,6 +295,9 @@ int MOAIHusky::_leaderboardSetScoreCallback( lua_State* L ) {
 
 int MOAIHusky::_leaderboardGetScores( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "USBBSNN" )
+	
+	if (self->_instance == NULL)
+		return 0;
 	
 	cc8* name = state.GetValue<cc8*>(2, 0);
 	bool friends = state.GetValue<bool>(3,0);
@@ -306,6 +323,9 @@ int MOAIHusky::_leaderboardGetScores( lua_State* L ) {
 int MOAIHusky::_leaderboardSetGetScoresCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
 	
+	if (self->_instance == NULL)
+		return 0;
+	
 	self->SetLocal(state, 2, self->_leaderboardScoreGetCallback);
 	
 	return 0;
@@ -313,6 +333,9 @@ int MOAIHusky::_leaderboardSetGetScoresCallback( lua_State* L ) {
 
 int MOAIHusky::_cloudDataUpload( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "US" )
+
+	if (self->_instance == NULL)
+		return 0;
 	
 	cc8* cloudpath = state.GetValue<cc8*>(2, 0);
 	MOAIDataBuffer* data = state.GetLuaObject < MOAIDataBuffer >( 3, true );
@@ -323,6 +346,9 @@ int MOAIHusky::_cloudDataUpload( lua_State* L ) {
 
 int MOAIHusky::_cloudDataSetUploadCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
+
+	if (self->_instance == NULL)
+		return 0;
 	
 	self->SetLocal(state, 2, self->_cloudDataUploadCallback);
 	
@@ -331,6 +357,9 @@ int MOAIHusky::_cloudDataSetUploadCallback( lua_State* L ) {
 
 int MOAIHusky::_cloudDataDownload( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "US" )
+	
+	if (self->_instance == NULL)
+		return 0;
 	
 	cc8* cloudpath = state.GetValue<cc8*>(2, 0);
 	self->_instance->requestCloudData(cloudpath);
@@ -341,6 +370,9 @@ int MOAIHusky::_cloudDataDownload( lua_State* L ) {
 int MOAIHusky::_cloudDataSetDownloadCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
 	
+	if (self->_instance == NULL)
+		return 0;
+
 	self->SetLocal(state, 2, self->_cloudDataDownloadCallback);
 	
 	return 0;
@@ -348,8 +380,10 @@ int MOAIHusky::_cloudDataSetDownloadCallback( lua_State* L ) {
 
 int MOAIHusky::_doTick(lua_State *L) {
 	// TODO: it'd be good if this was run automagically as part of Sledge rather than having to start the callback from lua-land
-
 	MOAI_LUA_SETUP(MOAIHusky, "U");
+	
+	if (self->_instance == NULL)
+		return 0;
 	
 	if (self->_instance != NULL) {
 		self->_instance->doTick();
