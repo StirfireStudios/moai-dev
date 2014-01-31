@@ -300,6 +300,10 @@ public class Moai {
 	//----------------------------------------------------------------//
 	public static void init () {
 		synchronized ( sAkuLock ) {
+			AKUInitializeUtil ();
+			AKUInitializeSim ();
+			AKUInitializeHttpClient ();
+
 			boolean ouya = Build.MANUFACTURER.contains("OUYA");
 			if (ouya)
 				AKUSetInputConfigurationName 	( "Ouya" );
@@ -323,10 +327,6 @@ public class Moai {
 			AKUSetInputDeviceLevel			( Moai.InputDevice.INPUT_DEVICE.ordinal (), Moai.InputSensor.SENSOR_LEVEL.ordinal (), "level" );
 			AKUSetInputDeviceLocation		( Moai.InputDevice.INPUT_DEVICE.ordinal (), Moai.InputSensor.SENSOR_LOCATION.ordinal (), "location" );
 			AKUSetInputDeviceTouch			( Moai.InputDevice.INPUT_DEVICE.ordinal (), Moai.InputSensor.SENSOR_TOUCH.ordinal (), "touch" );
-
-			AKUInitializeUtil ();
-			AKUInitializeSim ();
-			AKUInitializeHttpClient ();
 
 			AKUSetInputDevice(1, "pad0");
 			AKUSetInputDeviceExtendedName(1, "Joypad");
