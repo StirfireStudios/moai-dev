@@ -118,7 +118,7 @@ public class MoaiActivity extends Activity implements ControllerListener {
   			}
       	// END OUYA CODE
     	} else {
-    	 §mController = Controller.getInstance(this);
+    	 mController = Controller.getInstance(this);
 			 mController.init();
 			 mController.setListener(this, new Handler());
     	}
@@ -837,10 +837,6 @@ public class MoaiActivity extends Activity implements ControllerListener {
 
 				Display display = (( WindowManager ) getSystemService ( Context.WINDOW_SERVICE )).getDefaultDisplay ();
 				canonicalOrientationToScreenOrientation ( display.getRotation (), event.values, mAccelerometerData );
-
-				float x = mAccelerometerData [ 0 ];
-				float y = mAccelerometerData [ 1 ];
-				float z = mAccelerometerData [ 2 ];
 
 				float x = mAccelerometerData [ 0 ];
 				float y = mAccelerometerData [ 1 ];

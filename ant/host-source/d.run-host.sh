@@ -38,7 +38,7 @@
 		android_sdk_root=$local_root/$android_sdk_root
 	fi
 	
-	if [ x"$android_sdk_root" = x ] || [ ! -d $android_sdk_root ]; then		
+	if [ x"$android_sdk_root" = x ] || [ ! -d "$android_sdk_root" ]; then		
 		echo -e "*** Please specify a valid path to the Android SDK in \"settings-local.sh\""
 		echo
 		exit 1
@@ -82,6 +82,8 @@
 
 	if [[ x"$ouya_store_key" != x ]] && [[ -f "$ouya_store_key" ]]; then
 		cp -f "$ouya_store_key" $out_dir/project/res/raw/ouyakey.der
+	else
+		echo "1" > $out_dir/project/res/raw/ouyakey.der
 	fi
 		
 	if [ x"$key_store" != x ] && [ x"$local_root" != x ] && [[ ! $key_store == /* ]]; then
@@ -220,7 +222,7 @@
 		if [ x"$source_dir" != x ] && [ x"$local_root" != x ] && [[ ! $source_dir == /* ]]; then
 			source_dir=$local_root/$source_dir
 		fi
-		pushd $source_dir > /dev/null
+		pushd "$source_dir" > /dev/null
 			find -L . -name ".?*" -type d -prune -o -name "*.sh" -type f -prune -o -name "*.bat" -type f -prune -o -type f -print0 | cpio -pmd0 --quiet $out_dir/project/assets/${dest_dirs[$i]}
 		popd > /dev/null
 	done

@@ -367,6 +367,7 @@ public class Moai {
 			}
 
 			String appVersion;
+			int buildNumber = 0;
 
 			try {
 				appVersion = sActivity.getPackageManager ().getPackageInfo ( appId, 0 ).versionName;
