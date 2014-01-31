@@ -260,9 +260,11 @@
         popd > /dev/null
     fi
 	
+  cpus=`sysctl -n machdep.cpu.thread_count`
+
 	# build libmoai
 	pushd jni > /dev/null
-		ndk-build $verbose
+		ndk-build -j $cpus $verbose
 	popd > /dev/null
 
 	# remove temp files

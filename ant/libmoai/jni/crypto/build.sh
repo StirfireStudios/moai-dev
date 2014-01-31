@@ -33,10 +33,11 @@
 	else
 		
 		pushd osx > /dev/null
-		
+		cpus=`sysctl -n machdep.cpu.thread_count`
+
 		# build libcrypto
 		pushd jni > /dev/null
-			ndk-build
+			ndk-build -j $cpus
 		popd > /dev/null
 	fi
 
