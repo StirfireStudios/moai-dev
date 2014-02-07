@@ -92,6 +92,8 @@ int MOAILogMgr::_log ( lua_State* L ) {
 	// TODO: Fix this on Android
 	#ifndef MOAI_OS_ANDROID
 		ZLLog::PrintFile ( ZLLog::CONSOLE, msg );
+	#else
+		ZLLog::Print ( msg );
 	#endif
 	
 	return 0;

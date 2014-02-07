@@ -813,6 +813,8 @@ bool MOAILuaState::PrintErrors ( FILE* file, int status ) {
 			// TODO: Fix this on Android
 			#ifndef MOAI_OS_ANDROID
 				ZLLog::PrintFile ( file, "-- %s\n", msg.c_str ());
+			#else
+				ZLLog::Print ("-- %s\n", msg.c_str ());
 			#endif
 		}
 		lua_pop ( this->mState, 1 ); // pop error message
@@ -828,6 +830,8 @@ void MOAILuaState::PrintStackTrace ( FILE* file, int level ) {
 	// TODO: Fix this on Android
 	#ifndef MOAI_OS_ANDROID
 		ZLLog::PrintFile ( file, stackTrace.str ());
+	#else
+		ZLLog::Print (stackTrace.str());
 	#endif
 }
 
