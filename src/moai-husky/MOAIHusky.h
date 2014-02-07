@@ -17,6 +17,8 @@
 #elif WIN32
 	#include <Windows.h>
 	typedef HMODULE HuskyDLLHandle;
+#else
+	typedef void* HuskyDLLHandle;
 #endif
 #include <Husky.h>
 

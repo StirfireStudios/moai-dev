@@ -109,6 +109,7 @@
 	MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/tinyxml
 	MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/tlsf-2.0
 	MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/3rdparty/zlib-1.2.3
+	MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/Husky/shared
 
 	ifeq ($(USE_FMOD),true)
 		MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/src/moai-fmod-ex

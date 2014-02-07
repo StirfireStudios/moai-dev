@@ -17,5 +17,6 @@
   LOCAL_SRC_FILES   += $(wildcard $(MY_MOAI_ROOT)/src/moai-box2d/*.cpp) 
   LOCAL_SRC_FILES   += $(wildcard $(MY_MOAI_ROOT)/src/moai-chipmunk/*.cpp) 
   LOCAL_SRC_FILES   += $(wildcard $(MY_MOAI_ROOT)/src/moai-http-client/*.cpp) 
+  LOCAL_SRC_FILES   += $(wildcard $(MY_MOAI_ROOT)/src/moai-husky/*.cpp) 
 
 	include $(BUILD_STATIC_LIBRARY)
