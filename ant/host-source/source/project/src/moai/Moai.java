@@ -143,6 +143,7 @@ public class Moai {
 	protected static native void	AKUInitializeUtil 				();
 	protected static native void	AKUInitializeSim 				();
 	protected static native void	AKUInitializeHttpClient 		();
+	protected static native void	AKUInitializeHusky ();	
 	protected static native void	AKUMountVirtualDirectory 		( String virtualPath, String archive );
 	protected static native void	AKUPause 						( boolean paused );
 	protected static native void	AKURender	 					();
@@ -303,6 +304,7 @@ public class Moai {
 			AKUInitializeUtil ();
 			AKUInitializeSim ();
 			AKUInitializeHttpClient ();
+			AKUInitializeHusky ();
 
 			boolean ouya = Build.MANUFACTURER.contains("OUYA");
 			if (ouya)

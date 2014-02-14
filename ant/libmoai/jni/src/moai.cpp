@@ -18,6 +18,7 @@
 #include <moai-sim/host.h>
 #include <moai-util/host.h>
 #include <moai-http-client/host.h>
+#include <moai-husky/host.h>
 #include <moai-luaext/host.h>
 
 #if MOAI_WITH_BOX2D
@@ -390,6 +391,11 @@
     //----------------------------------------------------------------//
 	extern "C" void Java_com_ziplinegames_moai_Moai_AKUInitializeHttpClient ( JNIEnv* env, jclass obj ) {
         AKUInitializeHttpClient ();
+    }
+
+    //----------------------------------------------------------------//
+	extern "C" void Java_com_ziplinegames_moai_Moai_AKUInitializeHusky ( JNIEnv* env, jclass obj ) {
+        AKUInitializeHusky ();
     }
 
 	//----------------------------------------------------------------//
