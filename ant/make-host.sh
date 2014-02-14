@@ -11,7 +11,7 @@
 	usage="usage: $0 -p <package> [-s] [-i thumb | arm] [-a all | armeabi | armeabi-v7a] [-l appPlatform] [--use-fmod \
         true | false] [--use-untz true | false] [--use-luajit true | false] [--disable-adcolony] [--disable-billing] \
         [--disable-chartboost] [--disable-crittercism] [--disable-facebook] [--disable-push] [--disable-tapjoy] \
-        [--disable-twitter] [--disable-ouya] [--disable-moga]"
+        [--disable-twitter] [--ouya-dev-id <id>] [--disable-moga] [--husky gamecircle | stub]"
 	skip_build="false"
 	package_name=
 	arm_mode="arm"
@@ -20,8 +20,9 @@
 	use_fmod="false"
 	use_untz="true"
 	build_for_ouya="false"
-	ouya_dev_id="00000000-0000-0000-0000-000000000000"
+	ouya_dev_id="false"
 	use_luajit="true"
+	husky_type="stub"
 	adcolony_flags=
 	billing_flags=
 	chartboost_flags=
@@ -52,6 +53,7 @@
 			--disable-push)  push_flags="--disable-push";;
 			--disable-tapjoy)  tapjoy_flags="--disable-tapjoy";;
 			--disable-twitter)  twitter_flags="--disable-twitter";;
+			--husky)  husky_type="$2"; shift;;
 			-*)
 		    	echo >&2 \
 		    		$usage
@@ -88,11 +90,15 @@
 		exit 1
 	fi
 
-    if [ x"$use_luajit" != xtrue ] && [ x"$use_luajit" != xfalse ]; then
+  if [ x"$use_luajit" != xtrue ] && [ x"$use_luajit" != xfalse ]; then
 		echo $usage
 		exit 1
 	fi
 
+  if [ x"$husky_type" != x"stub" ] && [ x"$husky_type" != x"gamecircle" ]; then
+		echo $usage
+		exit 1
+	fi
 
 	if [ x"$use_fmod" == xtrue ] && [ x"$FMOD_ANDROID_SDK_ROOT" == x ]; then
 		echo "*** The FMOD SDK is not redistributed with the Moai SDK. Please download the FMOD EX"
@@ -111,7 +117,7 @@
 		pushd libmoai > /dev/null
 			bash build.sh -i $arm_mode -a $arm_arch -l $app_platform --use-fmod $use_fmod --use-untz $use_untz \
                 --use-luajit $use_luajit $adcolony_flags $billing_flags $chartboost_flags $crittercism_flags \
-                $facebook_flags $push_flags $tapjoy_flags $twitter_flags
+                $facebook_flags $push_flags $tapjoy_flags $twitter_flags --husky $husky_type
 		popd > /dev/null
 	fi
 

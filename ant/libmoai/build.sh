@@ -12,7 +12,7 @@
 	usage="usage: $0 [-v] [-i thumb | arm] [-a all | armeabi | armeabi-v7a] [-l appPlatform] [--use-fmod true | false] \
         [--use-untz true | false] [--use-luajit true | false] [--disable-adcolony] [--disable-billing] \
         [--disable-chartboost] [--disable-crittercism] [--disable-facebook] [--disable-push] [--disable-tapjoy] \
-        [disable-twitter]"
+        [disable-twitter] [--husky gamecircle | stub]"
 	arm_mode="arm"
 	arm_arch="armeabi-v7a"
 	app_platform="android-14"
@@ -27,6 +27,7 @@
 	push_flags=
 	tapjoy_flags=
 	twitter_flags=
+	husky_type="stub"
 	
 	while [ $# -gt 0 ];	do
 	    case "$1" in
@@ -45,6 +46,7 @@
 			--disable-push)  push_flags="-DDISABLE_NOTIFICATIONS";;
 			--disable-tapjoy)  tapjoy_flags="-DDISABLE_TAPJOY";;
 			--disable-twitter)  twitter_flags="-DDISABLE_TWITTER";;
+			--husky)  husky_type="$2"; shift;;
 			-*)
 		    	echo >&2 \
 		    		$usage
@@ -78,10 +80,23 @@
 		exit 1		
 	fi
 
-    if [ x"$use_luajit" != xtrue ] && [ x"$use_luajit" != xfalse ]; then
+  if [ x"$use_luajit" != xtrue ] && [ x"$use_luajit" != xfalse ]; then
 		echo $usage
 		exit 1		
 	fi
+
+  if [ x"$husky_type" != x"stub" ] && [ x"$husky_type" != x"gamecircle" ]; then
+		echo $usage
+		exit 1
+	fi
+
+	if [ x"$husky_type" == xgamecircle ] && [ x"$AMAZON_GAME_CIRCLE_SDK_ROOT" == x ]; then
+		echo "*** The Amazon Game Circle SDK is not redistributed with the Moai SDK. Please download it"
+		echo "*** and ensure AMAZON_GAME_CIRCLE_SDK_ROOT environment variable is set and points to the root of the"
+		echo "*** Gamecircle SDK"
+		exit 1
+	fi
+
 
 	if [ x"$use_fmod" == xtrue ] && [ x"$FMOD_ANDROID_SDK_ROOT" == x ]; then
 		echo "*** The FMOD SDK is not redistributed with the Moai SDK. Please download the FMOD EX"
@@ -109,6 +124,7 @@
 		existing_push_flags=$( sed -n '12p' libs/package.txt )
 		existing_tapjoy_flags=$( sed -n '13p' libs/package.txt )
 		existing_twitter_flags=$( sed -n '14p' libs/package.txt )
+		existing_husky_type=$( sed -n '15p' libs/package.txt )
 
 		if [ x"$existing_arm_mode" != x"$arm_mode" ]; then
 			should_clean=true
@@ -130,7 +146,7 @@
 			should_clean=true
 		fi
 
-        if [ x"$existing_use_luajit" != x"$use_luajit" ]; then
+    if [ x"$existing_use_luajit" != x"$use_luajit" ]; then
 			should_clean=true
 		fi
 
@@ -161,7 +177,12 @@
 		if [ x"$existing_tapjoy_flags" != x"$tapjoy_flags" ]; then
 			should_clean=true
 		fi
-        if [ x"$existing_twitter_flags" != x"$twitter_flags" ]; then
+    
+    if [ x"$existing_twitter_flags" != x"$twitter_flags" ]; then
+			should_clean=true
+		fi
+
+    if [ x"$existing_husky_type" != x"$husky_type" ]; then
 			should_clean=true
 		fi
 
@@ -182,10 +203,9 @@
 		echo "UNTZ will be disabled"
 	fi 
 
-    if [ x"$use_luajit" != xtrue ]; then
+  if [ x"$use_luajit" != xtrue ]; then
 		echo "LuaJIT will be disabled"
 	fi 
-
 
 	if [ x"$adcolony_flags" != x ]; then
 		echo "AdColony will be disabled"
@@ -215,9 +235,11 @@
 		echo "Tapjoy will be disabled"
 	fi 
     
-    if [ x"$twitter_flags" != x ]; then
+  if [ x"$twitter_flags" != x ]; then
 		echo "Twitter will be disabled"
-	fi 
+	fi
+
+	echo "Husky type is: $husky_type"
 
 	pushd jni > /dev/null
 		cp -f AppPlatform.mk AppPlatformDefined.mk
@@ -245,6 +267,7 @@
 		sed -i.backup s%@USE_FMOD@%"$use_fmod"%g OptionalComponentsDefined.mk
 		sed -i.backup s%@USE_UNTZ@%"$use_untz"%g OptionalComponentsDefined.mk
 		sed -i.backup s%@USE_LUAJIT@%"$use_luajit"%g OptionalComponentsDefined.mk
+		sed -i.backup s%@HUSKY_TYPE@%"$husky_type"%g OptionalComponentsDefined.mk
 		rm -f OptionalComponentsDefined.mk.backup
 	popd > /dev/null
 	
@@ -291,3 +314,4 @@
 	echo "$push_flags" >> libs/package.txt
 	echo "$tapjoy_flags" >> libs/package.txt
 	echo "$twitter_flags" >> libs/package.txt
+	echo "$husky_type" >> libs/package.txt
