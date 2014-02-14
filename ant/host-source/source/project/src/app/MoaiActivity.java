@@ -76,9 +76,27 @@ public class MoaiActivity extends Activity implements ControllerListener {
 	private Controller						mController = null;
 	private Handler 						mButtonHandler = null;
 	private Runnable 						mMenuButtonDown = null;
+	// Amazon Game Circle Client - BEGIN
+	private com.amazon.ags.api.AmazonGamesClient amazongamecircleClient;
+
+	com.amazon.ags.api.AmazonGamesCallback amazonGameCircleCallback = new com.amazon.ags.api.AmazonGamesCallback() {
+		@Override
+		public void onServiceNotReady(com.amazon.ags.api.AmazonGamesStatus status) {
+		    //unable to use service
+		}
+		@Override
+		public void onServiceReady(com.amazon.ags.api.AmazonGamesClient amazonGamesClient) {
+		    amazongamecircleClient = amazonGamesClient;
+		}
+	};
+	// Amazon Game Circle Client - END
+
 
 	//----------------------------------------------------------------//
 	static {
+		MoaiLog.i ( "Loading libAmazonGamesJni.so.so" );
+
+		System.loadLibrary ( "AmazonGamesJni" );
 
 		MoaiLog.i ( "Loading libmoai.so" );
 
@@ -206,6 +224,12 @@ public class MoaiActivity extends Activity implements ControllerListener {
 		MoaiLog.i ( "MoaiActivity onPause: activity PAUSED" );
 
 		super.onPause ();
+
+		// AMAZON GAME CIRCLE
+		if (amazongamecircleClient != null) {
+			amazongamecircleClient.release();
+    }
+
 		Moai.onPause ();
 
 		if ( mAccelerometerListener != null ) {
@@ -242,6 +266,9 @@ public class MoaiActivity extends Activity implements ControllerListener {
 		MoaiLog.i ( "MoaiActivity onResume: activity RESUMED" );
 
 		super.onResume ();
+
+		// AMAZON GAME CIRCLE
+		com.amazon.ags.api.AmazonGamesClient.initialize(this, amazonGameCircleCallback, com.amazon.ags.api.AmazonGamesFeature.all());
 		Moai.onResume ();
 
 		if ( mAccelerometerListener != null ) {
