@@ -46,3 +46,5 @@
 	key_alias=
 	key_store_password=
 	key_alias_password=
+	controller_file=
+	gamecircle_key=

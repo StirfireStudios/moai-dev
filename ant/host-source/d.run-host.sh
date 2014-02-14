@@ -94,6 +94,14 @@
 		cp -f $key_store $out_dir/project/`basename $key_store`
 	fi
 			
+	if [ x"$controller_file" != x ] && [ -f "$controller_file" ]; then
+		cp -f "$controller_file" $out_dir/project/assets/controller.json
+	fi
+
+	if [ x"$gamecircle_key" != x ] && [ -f "$gamecircle_key" ]; then
+		cp -f "$gamecircle_key" $out_dir/project/assets/api_key.txt
+	fi
+
 	cp -f host-source/project/.classpath $out_dir/project/.classpath
 	cp -f host-source/project/proguard.cfg $out_dir/project/proguard.cfg
 	
