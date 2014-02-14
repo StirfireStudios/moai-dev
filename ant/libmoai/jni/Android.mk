@@ -22,6 +22,16 @@
 		include $(CLEAR_VARS)
 	endif
 
+	ifeq ($(HUSKY_TYPE), gamecircle)
+		LOCAL_PATH 				:= $(AMAZON_GAME_CIRCLE_SDK_ROOT)
+		LOCAL_MODULE := AmazonGamesJni
+		LOCAL_SRC_FILES := jni/libAmazonGamesJni.so
+		include $(PREBUILT_SHARED_LIBRARY)
+
+		include $(CLEAR_VARS)
+	endif
+
+
 	LOCAL_PATH := $(ORIGINAL_LOCAL_PATH)
 
 	#----------------------------------------------------------------#
@@ -54,6 +64,9 @@
 		LOCAL_CFLAGS	+= -DMOAI_WITH_LUAJIT
 	endif
 
+	ifeq ($(HUSKY_TYPE), gamecircle)
+		LOCAL_SHARED_LIBRARIES := AmazonGamesJni
+	endif
 	
 #----------------------------------------------------------------#
 # header search paths
@@ -180,6 +193,7 @@
 	LOCAL_STATIC_LIBRARIES += libssl
 	LOCAL_STATIC_LIBRARIES += libtinyxml
 	
+
 	include $(BUILD_SHARED_LIBRARY)
 
 #----------------------------------------------------------------#

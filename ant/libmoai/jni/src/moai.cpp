@@ -18,7 +18,6 @@
 #include <moai-sim/host.h>
 #include <moai-util/host.h>
 #include <moai-http-client/host.h>
-#include <moai-husky/host.h>
 #include <moai-luaext/host.h>
 
 #if MOAI_WITH_BOX2D
@@ -35,6 +34,14 @@
 
 #if MOAI_WITH_UNTZ
 	#include <moai-untz/host.h>
+#endif
+
+#if MOAI_WITH_GAME_CIRCLE_HUSKY
+
+#elif MOAI_WITH_GOOGLE_PLAY_HUSKY
+
+#else
+	#include <moai-husky-static-stub/host.h>	
 #endif
 
 //================================================================//

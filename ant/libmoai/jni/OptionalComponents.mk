@@ -15,3 +15,4 @@
 	USE_FMOD	 			:= @USE_FMOD@
 	USE_UNTZ 				:= @USE_UNTZ@
 	USE_LUAJIT 				:= @USE_LUAJIT@
+	HUSKY_TYPE 				:= @HUSKY_TYPE@
