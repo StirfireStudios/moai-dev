@@ -86,12 +86,12 @@
 		echo "1" > $out_dir/project/res/raw/ouyakey.der
 	fi
 		
-	if [ x"$key_store" != x ] && [ x"$local_root" != x ] && [[ ! $key_store == /* ]]; then
+	if [ x"$key_store" != x ] && [ x"$local_root" != x ] && [[ ! "$key_store" == /* ]]; then
 		key_store=$local_root/$key_store
 	fi
 	
-	if [ x"$key_store" != x ] && [ -f $key_store ]; then
-		cp -f $key_store $out_dir/project/`basename $key_store`
+	if [ x"$key_store" != x ] && [ -f "$key_store" ]; then
+		cp -f "$key_store" $out_dir/project/`basename $key_store`
 	fi
 			
 	if [ x"$controller_file" != x ] && [ -f "$controller_file" ]; then
