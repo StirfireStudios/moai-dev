@@ -59,6 +59,8 @@ import com.bda.controller.ControllerListener;
 // MoaiActivity
 //================================================================//
 public class MoaiActivity extends Activity implements ControllerListener {
+	private enum DPadYState { UP, CENTER, DOWN };
+	private enum DPadXState { LEFT, CENTER, RIGHT };
 
 	private AccelerometerEventListener		mAccelerometerListener = null;
 	private Sensor							mAccelerometerSensor = null;
@@ -74,6 +76,8 @@ public class MoaiActivity extends Activity implements ControllerListener {
 	private float[]							mLS = new float[2];
 	private float[] 						mRS = new float[2];
 	private float[]							mTrigg = new float[2];
+	private DPadXState					mDPadX = DPadXState.CENTER;
+	private DPadYState					mDPadY = DPadYState.CENTER;
 	private Controller						mController = null;
 	private Handler 						mButtonHandler = null;
 	private Runnable 						mMenuButtonDown = null;
@@ -644,8 +648,8 @@ public class MoaiActivity extends Activity implements ControllerListener {
 			}
 			// END OUYA CODE
 		} else if ((event.getSource() == InputDevice.SOURCE_JOYSTICK) || 
-				(event.getSource() == InputDevice.SOURCE_JOYSTICK)) {
-			handled = true;
+				(event.getSource() == InputDevice.SOURCE_GAMEPAD)) {
+
 			float temp = event.getAxisValue(MotionEvent.AXIS_X);
 			boolean update = false;
 
@@ -662,53 +666,111 @@ public class MoaiActivity extends Activity implements ControllerListener {
 			}
 
 			if (update) {
-				MoaiLog.i("Updated Left Stick: " + mLS[0] + ", " + mLS[1]);
 				Moai.AKUEnqueueJoystickEvent(1, 0, mLS[0], mLS[1]);
+				handled = true;
 			}
 			
 			temp = event.getAxisValue(MotionEvent.AXIS_Z);
 			update = false;
 
-			if (temp != mLS[0]) {
+			if (temp != mRS[0]) {
 				mRS[0] = temp;
 				update = true;
 			}
 
 			temp = event.getAxisValue(MotionEvent.AXIS_RZ);
 
-			if (temp != mLS[1]) {
+			if (temp != mRS[1]) {
 				mRS[1] = temp;
 				update = true;
 			}
 
 			if (update) {
-				MoaiLog.i("Updated Right Stick: " + mRS[0] + ", " + mRS[1]);
 				Moai.AKUEnqueueJoystickEvent(1, 1, mRS[0], mRS[1]);
+				handled = true;
 			}
 
 			temp = event.getAxisValue(MotionEvent.AXIS_BRAKE);
 			update = false;
 
-			if (temp != mLS[0]) {
+			if (temp != mTrigg[0]) {
 				mTrigg[0] = temp;
 				update = true;
 			}
 
 			temp = event.getAxisValue(MotionEvent.AXIS_GAS);
 
-			if (temp != mLS[1]) {
+			if (temp != mTrigg[1]) {
 				mTrigg[1] = temp;
 				update = true;
 			}
 
 			if (update) {
-				MoaiLog.i("Updated Trigger 2s: " + mTrigg[0] + ", " + mTrigg[1]);
 				Moai.AKUEnqueueJoystickEvent(1, 2, mTrigg[0], mTrigg[1]);
+				handled = true;
 			}
+
+			temp = event.getAxisValue(MotionEvent.AXIS_HAT_X);
+
+			if (temp == 0) {
+				if (mDPadX != DPadXState.CENTER) {
+					handled = true;
+					if (mDPadX == DPadXState.LEFT)
+						Moai.AKUEnqueueKeyboardEvent(1, 3, 13, false);
+					else
+						Moai.AKUEnqueueKeyboardEvent(1, 3, 14, false);
+					mDPadX = DPadXState.CENTER;
+				}
+			} else if (temp < 0) {
+				if (mDPadX != DPadXState.LEFT) {
+					handled = true;
+					if (mDPadX == DPadXState.RIGHT)
+						Moai.AKUEnqueueKeyboardEvent(1, 3, 14, false);
+					Moai.AKUEnqueueKeyboardEvent(1, 3, 13, true);
+					mDPadX = DPadXState.LEFT;
+				}
+			} else if (temp > 0) {
+				if (mDPadX != DPadXState.RIGHT) {
+					handled = true;
+					if (mDPadX == DPadXState.LEFT)
+						Moai.AKUEnqueueKeyboardEvent(1, 3, 13, false);
+					Moai.AKUEnqueueKeyboardEvent(1, 3, 14, true);
+					mDPadX = DPadXState.RIGHT;
+				}
+			}
+
+			temp = event.getAxisValue(MotionEvent.AXIS_HAT_Y);
+
+			if (temp == 0) {
+				if (mDPadY != DPadYState.CENTER) {
+					handled = true;
+					if (mDPadY == DPadYState.UP)
+						Moai.AKUEnqueueKeyboardEvent(1, 3, 11, false);
+					else
+						Moai.AKUEnqueueKeyboardEvent(1, 3, 12, false);
+					mDPadY = DPadYState.CENTER;
+				}
+			} else if (temp < 0) {
+				if (mDPadY != DPadYState.UP) {
+					handled = true;
+					if (mDPadY == DPadYState.DOWN)
+						Moai.AKUEnqueueKeyboardEvent(1, 3, 12, false);
+					Moai.AKUEnqueueKeyboardEvent(1, 3, 11, true);
+					mDPadY = DPadYState.UP;
+				}
+			} else if (temp > 0) {
+				if (mDPadY != DPadYState.DOWN) {
+					handled = true;
+					if (mDPadY == DPadYState.UP)
+						Moai.AKUEnqueueKeyboardEvent(1, 3, 11, false);
+					Moai.AKUEnqueueKeyboardEvent(1, 3, 12, true);
+					mDPadY = DPadYState.DOWN;
+				}
+			}
+
 		}
 		return handled;
 	}
-
 	// END OUYA CODE
 
 	// MOGA LISTENER CODE
