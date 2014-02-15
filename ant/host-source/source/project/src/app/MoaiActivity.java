@@ -30,6 +30,8 @@ import android.view.KeyEvent;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.view.InputDevice;
+import android.view.MotionEvent;
 
 // Moai
 import com.ziplinegames.moai.*;
@@ -45,7 +47,6 @@ import android.provider.Settings.Secure;
 // OUYA CODE
 import tv.ouya.console.api.OuyaController;
 import tv.ouya.console.api.OuyaFacade;
-import android.view.MotionEvent;
 import android.os.Handler;
 import android.os.Looper;
 // END OUYA CODE
@@ -92,6 +93,10 @@ public class MoaiActivity extends Activity implements ControllerListener {
 	// Amazon Game Circle Client - END
 
 
+	// OUYA
+	private boolean mOuya = false;
+	//
+
 	//----------------------------------------------------------------//
 	static {
 		MoaiLog.i ( "Loading libAmazonGamesJni.so.so" );
@@ -114,6 +119,7 @@ public class MoaiActivity extends Activity implements ControllerListener {
     	// OUYA CODE
     	OuyaFacade.getInstance().init(this, "@OUYA_DEV_ID@");
     	if (OuyaFacade.getInstance().isRunningOnOUYAHardware()) {
+    		mOuya = true;
   			OuyaController.init(this);
   			mButtonHandler = new Handler ( Looper.getMainLooper ());
   			mMenuButtonDown = new Runnable () {
@@ -430,14 +436,18 @@ public class MoaiActivity extends Activity implements ControllerListener {
 					Moai.AKUEnqueueKeyboardEvent(1, 3, 6, true);
 					mButtonHandler.removeCallbacks(mMenuButtonDown);
 					mButtonHandler.postDelayed ( mMenuButtonDown , 100 );
-					handled = true;
+				} else {
+					Moai.AKUEnqueueKeyboardEvent(1, 3, 6, true);
 				}
+				handled = true;
 				break;
 			case KeyEvent.KEYCODE_BUTTON_SELECT:
 				Moai.AKUEnqueueKeyboardEvent(1, 3, 4, true);
+				handled = true;
 				break;
 			case KeyEvent.KEYCODE_BUTTON_START:
 				Moai.AKUEnqueueKeyboardEvent(1, 3, 6, true);
+				handled = true;
 				break;
 			case OuyaController.BUTTON_L3:
 //			case KeyEvent.KEYCODE_BUTTON_THUMBL:
@@ -505,11 +515,19 @@ public class MoaiActivity extends Activity implements ControllerListener {
 				Moai.AKUEnqueueKeyboardEvent(1, 3, 1, false);
 				handled = true;
 				break;
+			case OuyaController.BUTTON_MENU:
+				if (!OuyaFacade.getInstance().isRunningOnOUYAHardware()) {
+					Moai.AKUEnqueueKeyboardEvent(1, 3, 6, false);
+				}
+				handled = true;
+				break;				
 			case KeyEvent.KEYCODE_BUTTON_SELECT:
 				Moai.AKUEnqueueKeyboardEvent(1, 3, 4, false);
+				handled = true;
 				break;
 			case KeyEvent.KEYCODE_BUTTON_START:
 				Moai.AKUEnqueueKeyboardEvent(1, 3, 6, false);
+				handled = true;
 				break;
 			case OuyaController.BUTTON_L3:
 				Moai.AKUEnqueueKeyboardEvent(1, 3, 7, false);
@@ -555,16 +573,80 @@ public class MoaiActivity extends Activity implements ControllerListener {
 
 	// OUYA CODE
 	public boolean onGenericMotionEvent(MotionEvent event) {
-		//Get the player #
-		int odid = event.getDeviceId();
-		boolean handled = OuyaController.onGenericMotionEvent(event);
+		boolean handled = false;
+		if (mOuya) {
+			// OUYA CODE
+			//Get the player #
+			int odid = event.getDeviceId();
+			handled = OuyaController.onGenericMotionEvent(event);
 
-		if (handled) {
+			if (handled) {
 
-			OuyaController c = OuyaController.getControllerByDeviceId(odid);
+				OuyaController c = OuyaController.getControllerByDeviceId(odid);
 
-			//Get all the axis for the event
-			float temp = c.getAxisValue(OuyaController.AXIS_LS_X);
+				//Get all the axis for the event
+				float temp = c.getAxisValue(OuyaController.AXIS_LS_X);
+				boolean update = false;
+
+				if (temp != mLS[0]) {
+					mLS[0] = temp;
+					update = true;
+				}
+
+				temp = c.getAxisValue(OuyaController.AXIS_LS_Y);
+
+				if (temp != mLS[1]) {
+					mLS[1] = temp;
+					update = true;
+				}
+
+				if (update) {
+					Moai.AKUEnqueueJoystickEvent(1, 0, mLS[0], mLS[1]);
+				}
+
+				temp = c.getAxisValue(OuyaController.AXIS_RS_X);
+				update = false;
+
+				if (temp != mRS[0]) {
+					mRS[0] = temp;
+					update = true;
+				}
+
+				temp = c.getAxisValue(OuyaController.AXIS_RS_Y);
+
+				if (temp != mRS[1]) {
+					mRS[1] = temp;
+					update = true;
+				}
+
+				if (update) {
+					Moai.AKUEnqueueJoystickEvent(1, 1, mRS[0], mRS[1]);
+				}
+
+				temp = c.getAxisValue(OuyaController.AXIS_L2);
+				update = false;
+
+				if (temp != mTrigg[0]) {
+					mTrigg[0] = temp;
+					update = true;
+				}
+
+				temp = c.getAxisValue(OuyaController.AXIS_R2);
+
+				if (temp != mTrigg[1]) {
+					mTrigg[1] = temp;
+					update = true;
+				}
+
+				if (update) {
+					Moai.AKUEnqueueJoystickEvent(1, 2, mTrigg[0], mTrigg[1]);
+				}
+			}
+			// END OUYA CODE
+		} else if ((event.getSource() == InputDevice.SOURCE_JOYSTICK) || 
+				(event.getSource() == InputDevice.SOURCE_JOYSTICK)) {
+			handled = true;
+			float temp = event.getAxisValue(MotionEvent.AXIS_X);
 			boolean update = false;
 
 			if (temp != mLS[0]) {
@@ -572,7 +654,7 @@ public class MoaiActivity extends Activity implements ControllerListener {
 				update = true;
 			}
 
-			temp = c.getAxisValue(OuyaController.AXIS_LS_Y);
+			temp = event.getAxisValue(MotionEvent.AXIS_Y);
 
 			if (temp != mLS[1]) {
 				mLS[1] = temp;
@@ -580,44 +662,47 @@ public class MoaiActivity extends Activity implements ControllerListener {
 			}
 
 			if (update) {
+				MoaiLog.i("Updated Left Stick: " + mLS[0] + ", " + mLS[1]);
 				Moai.AKUEnqueueJoystickEvent(1, 0, mLS[0], mLS[1]);
 			}
-
-			temp = c.getAxisValue(OuyaController.AXIS_RS_X);
+			
+			temp = event.getAxisValue(MotionEvent.AXIS_Z);
 			update = false;
 
-			if (temp != mRS[0]) {
+			if (temp != mLS[0]) {
 				mRS[0] = temp;
 				update = true;
 			}
 
-			temp = c.getAxisValue(OuyaController.AXIS_RS_Y);
+			temp = event.getAxisValue(MotionEvent.AXIS_RZ);
 
-			if (temp != mRS[1]) {
+			if (temp != mLS[1]) {
 				mRS[1] = temp;
 				update = true;
 			}
 
 			if (update) {
+				MoaiLog.i("Updated Right Stick: " + mRS[0] + ", " + mRS[1]);
 				Moai.AKUEnqueueJoystickEvent(1, 1, mRS[0], mRS[1]);
 			}
 
-			temp = c.getAxisValue(OuyaController.AXIS_L2);
+			temp = event.getAxisValue(MotionEvent.AXIS_BRAKE);
 			update = false;
 
-			if (temp != mTrigg[0]) {
+			if (temp != mLS[0]) {
 				mTrigg[0] = temp;
 				update = true;
 			}
 
-			temp = c.getAxisValue(OuyaController.AXIS_R2);
+			temp = event.getAxisValue(MotionEvent.AXIS_GAS);
 
-			if (temp != mTrigg[1]) {
+			if (temp != mLS[1]) {
 				mTrigg[1] = temp;
 				update = true;
 			}
 
 			if (update) {
+				MoaiLog.i("Updated Trigger 2s: " + mTrigg[0] + ", " + mTrigg[1]);
 				Moai.AKUEnqueueJoystickEvent(1, 2, mTrigg[0], mTrigg[1]);
 			}
 		}
