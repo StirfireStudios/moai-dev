@@ -132,7 +132,7 @@ namespace {
 #include <moai-untz/host.h>
 #endif
 
-#include <moai-husky/MOAIHusky.h>
+#include <moai-husky-dynamic/MOAIHusky.h>
 
 #ifdef _WIN32
 
