@@ -218,6 +218,26 @@ int MOAIHusky::_hasCloudSaves( lua_State* L ) {
 	return 1;
 }
 
+int MOAIHusky::_hasGenericOverlay( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+	
+	if (self->_instance == NULL)
+		return 0;
+	
+	state.Push(self->_huskyCapabilities && HuskyHasGenericOverlay);
+	return 1;
+}
+
+int MOAIHusky::_showGenericOverlay( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "" )
+	
+	if (self->_instance == NULL)
+		return 0;
+	
+	self->_instance->showOverlay();
+	return 0;
+}
+
 int MOAIHusky::_achievementReset( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "" )
 	
@@ -406,20 +426,29 @@ void MOAIHusky::RegisterLuaClass ( MOAILuaState& state ) {
 		{ "getAvailable",						_getAvailable },
 		{ "getCurrent",							_getCurrent },
 		{ "setCurrent",							_setCurrent },
-		{ "hasLeaderboards",						_hasLeaderboards },
-		{ "hasAchievements",						_hasAchievements },
-		{ "hasCloudSaves",						_hasCloudSaves },
+		{ "hasGenericOverlay",					_hasGenericOverlay },
+		{ "showGenericOverlay",					_showGenericOverlay },
+		//{ "hasAchievementsReset",				_hasAchievements },
 		{ "achievementReset",					_achievementReset },
 		{ "achievementSet",						_achievementSet },
 		{ "achievementSetCallback",				_achievementSetCallback },
-		{ "leaderboardUploadScore",				_leaderboardUploadScore },
-		{ "leaderboardSetUploadScoreCallback",	_leaderboardSetScoreCallback },
-		{ "leaderboardGetScores",				_leaderboardGetScores },
-		{ "leaderboardSetGetScoresCallback",		_leaderboardSetGetScoresCallback },
+		//{ "showAchievementsOverlay",			_showGenericOverlay },
+		//{ "hasAchievementsOverlay",			_hasAchievements },
+		{ "hasAchievements",						_hasAchievements },
 		{ "cloudDataUpload",						_cloudDataUpload },
 		{ "cloudDataSetUploadCallback",			_cloudDataSetUploadCallback },
 		{ "cloudDataDownload",					_cloudDataDownload },
 		{ "cloudDataSetDownloadCallback",		_cloudDataSetDownloadCallback },
+		{ "hasCloudSaves",						_hasCloudSaves },
+		//{ "leaderboardMetadataBytes",			_hasLeaderboards },
+		{ "leaderboardUploadScore",				_leaderboardUploadScore },
+		{ "leaderboardSetUploadScoreCallback",	_leaderboardSetScoreCallback },
+		{ "leaderboardGetScores",				_leaderboardGetScores },
+		{ "leaderboardSetGetScoresCallback",		_leaderboardSetGetScoresCallback },
+		{ "hasLeaderboards",						_hasLeaderboards },
+		//{ "hasLeaderboardRangeFetch",			_hasLeaderboards },
+		//{ "hasLeaderboardOverlay",				_hasLeaderboards },
+		//{ "showLeaderboardOverlay",			_showGenericOverlay },
 		{ "doTick", _doTick },
 		{ NULL, NULL }
 	};
