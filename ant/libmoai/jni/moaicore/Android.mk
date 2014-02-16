@@ -17,15 +17,14 @@
   LOCAL_SRC_FILES   += $(wildcard $(MY_MOAI_ROOT)/src/moai-box2d/*.cpp) 
   LOCAL_SRC_FILES   += $(wildcard $(MY_MOAI_ROOT)/src/moai-chipmunk/*.cpp) 
   LOCAL_SRC_FILES   += $(wildcard $(MY_MOAI_ROOT)/src/moai-http-client/*.cpp)
-  LOCAL_SRC_FILES   += $(wildcard $(MY_MOAI_ROOT)/src/moai-husky-host/*.cpp) 
 
   ifeq ($(HUSKY_TYPE), gamecircle)
   	LOCAL_C_INCLUDES += $(AMAZON_GAME_CIRCLE_SDK_ROOT)/jni/includes
 		LOCAL_SRC_FILES += $(wildcard $(MY_MOAI_ROOT)/src/moai-husky-static-gamecircle/*.cpp) 
 	else ifeq ($(HUSKY_TYPE), "googleplay")
-		LOCAL_SRC_FILES += $(wildcard $(MY_MOAI_ROOT)/src/moai-husky-host/*.cpp) 
+		LOCAL_SRC_FILES += $(wildcard $(MY_MOAI_ROOT)/src/moai-husky-static-stub/*.cpp) 
 	else
-#		LOCAL_SRC_FILES += $(wildcard $(MY_MOAI_ROOT)/src/moai-husky-static-stub/*.cpp)
+		LOCAL_SRC_FILES += $(wildcard $(MY_MOAI_ROOT)/src/moai-husky-static-stub/*.cpp)
 	endif
 
 	include $(BUILD_STATIC_LIBRARY)
