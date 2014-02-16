@@ -12,18 +12,9 @@
 #define __libmoai__MOAIHusky__
 
 #include <Husky.h>
-#include <AchievementsClientInterface.h>
-#include <WhispersyncClientInterface.h>
+#include "HuskyGameCircle.h"
 
-class ProgressCallback {
-public:
-	char* name;
-	bool success;
-};
-
-typedef std::vector<ProgressCallback> ProgressCallbackList;
-
-class MOAIHusky : public MOAIGlobalClass <MOAIHusky, MOAILuaObject>, public AmazonGames::IUpdateProgressCb {
+class MOAIHusky : public MOAIGlobalClass <MOAIHusky, MOAILuaObject>, public HuskyObserver {
 private:
 	static int _getAvailable						( lua_State *L );
 	static int _getCurrent							( lua_State *L );
@@ -43,20 +34,20 @@ private:
 	static int _cloudDataDownload					( lua_State *L );
 	static int _cloudDataSetDownloadCallback		( lua_State *L );
 	static int _doTick								( lua_State *L );
-	
-//	void HuskyObserverAchievementCallback(const char *name, bool success);
+
+	void HuskyObserverAchievementCallback(const char *name, bool success);
 	void HuskyObserverLeaderboardScoreSetCallback(const char *name, bool success);
 	void HuskyObserverLeaderboardScoreGetCallback(const char *name, HuskyLeaderboardEntry *entries, int number);
-	void onUpdateProgressCb(AmazonGames::ErrorCode errorCode, const AmazonGames::UpdateProgressResponse* responseStruct, int developerTag);
-	
+	void HuskyObserverCloudDataDownloaded(const char *cloudfilename, void* buffer, int32_t bytes);
+	void HuskyObserverCloudDataUploaded(const char *path, bool success);
+		
 	MOAILuaLocal _achievementCallback;
 	MOAILuaLocal _leaderboardScoreSetCallback;
 	MOAILuaLocal _leaderboardScoreGetCallback;
 	MOAILuaLocal _cloudDataUploadCallback;
 	MOAILuaLocal _cloudDataDownloadCallback;
 
-//	ProgressCallbackList* _progressCallbackList;
-	AmazonGames::GameDataMap* _cloudDataMap;
+	HuskyGameCircle* getInstance();
 	
 public:
 	DECL_LUA_SINGLETON ( MOAIHusky )

@@ -12,12 +12,14 @@ MOAIHusky::MOAIHusky() {
 	RTTI_BEGIN
 	RTTI_EXTEND(MOAILuaObject)
 	RTTI_END
-
-	_cloudDataMap = NULL;
-//	_progressCallbackList = new AchievmentCallbacks();
 }
 
 MOAIHusky::~MOAIHusky() {
+	HuskyGameCircle::shutdownInstance();
+}
+
+HuskyGameCircle* MOAIHusky::getInstance() {
+	return HuskyGameCircle::getInstance();
 }
 
 int MOAIHusky::_getAvailable( lua_State* L ) {
@@ -26,6 +28,7 @@ int MOAIHusky::_getAvailable( lua_State* L ) {
 	int index = 0;
 	
 	lua_newtable(L);
+	lua_pushstring(L, "AmazonGameCircle");
 	return 1;
 }
 
@@ -50,18 +53,21 @@ int MOAIHusky::_setCurrent( lua_State* L ) {
 int MOAIHusky::_hasLeaderboards( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 		
+	state.Push(0);
 	return 0;
 }
 
 int MOAIHusky::_hasAchievements( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
-		
+	
+	state.Push(1);
 	return 1;
 }
 
 int MOAIHusky::_hasCloudSaves( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 
+	state.Push(1);
 	return 1;
 }
 
@@ -78,8 +84,7 @@ int MOAIHusky::_achievementSet( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "US" )
 
 	cc8* name = lua_tostring ( state, 2 );
-
-	AmazonGames::AchievementsClientInterface::updateProgress(name, 100, self, 0);
+	self->getInstance()->setAchievement(name);
 
 	return 0;
 }
@@ -87,6 +92,7 @@ int MOAIHusky::_achievementSet( lua_State* L ) {
 int MOAIHusky::_achievementSetCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
 	
+	self->getInstance()->setObserver(self);
 	self->SetLocal(state, 2, self->_achievementCallback);
 	
 	return 0;
@@ -125,6 +131,7 @@ int MOAIHusky::_leaderboardUploadScore( lua_State* L ) {
 int MOAIHusky::_leaderboardSetScoreCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
 	
+	self->getInstance()->setObserver(self);
 	self->SetLocal(state, 2, self->_leaderboardScoreSetCallback);
 
 	ZLLog::Print ( "Static GameCircle Husky provides no functions - leaderboardSetScoreCallback" );	
@@ -155,7 +162,8 @@ int MOAIHusky::_leaderboardGetScores( lua_State* L ) {
 
 int MOAIHusky::_leaderboardSetGetScoresCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
-	
+
+	self->getInstance()->setObserver(self);	
 	self->SetLocal(state, 2, self->_leaderboardScoreGetCallback);
 
 	ZLLog::Print ( "Static GameCircle Husky provides no functions - leaderboardSetGetScoresCallback" );	
@@ -171,14 +179,8 @@ int MOAIHusky::_cloudDataUpload( lua_State* L ) {
 	data->Base64Encode();
 	char* stringData = (char*)calloc(sizeof(char), data->getBuffer()->Size() + 1);
 	memcpy(stringData, data->getBuffer()->Data(), data->getBuffer()->Size());
-	ZLLog::Print ( "Static GameCircle Husky - encoded data!" );	
-	ZLLog::Print ( stringData );
 
-	if (self->_cloudDataMap == NULL)
-			self->_cloudDataMap = AmazonGames::WhispersyncClient::getGameData();
-
-	AmazonGames::SyncableString* syncString = self->_cloudDataMap->getLatestString(cloudpath);
-	syncString->set(stringData);
+	self->getInstance()->uploadCloudData(cloudpath, stringData, strlen(stringData));
 
 	return 0;
 }
@@ -187,6 +189,7 @@ int MOAIHusky::_cloudDataSetUploadCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
 	
 	self->SetLocal(state, 2, self->_cloudDataUploadCallback);
+	self->getInstance()->setObserver(self);
 	
 	return 0;
 }
@@ -200,23 +203,7 @@ int MOAIHusky::_cloudDataDownload( lua_State* L ) {
 		return 0;
 
 	cc8* cloudpath = state.GetValue<cc8*>(2, 0);
-
-	if (self->_cloudDataMap == NULL)
-			self->_cloudDataMap = AmazonGames::WhispersyncClient::getGameData();
-
-	const char* stringData = self->_cloudDataMap->getLatestString(cloudpath)->getValue();
-
-	MOAIDataBuffer *moaibuffer = new MOAIDataBuffer();
-	if (stringData != NULL) {
-		ZLLog::Print ( "Static GameCircle Husky Download - encoded data!" );	
-		ZLLog::Print ( stringData );
-		moaibuffer->Load((void*)stringData, strlen(stringData));
-		moaibuffer->Base64Decode();
-	}
-	self->PushLocal(state, self->_cloudDataDownloadCallback);
-	state.Push(cloudpath);
-	state.Push(moaibuffer);
-	state.DebugCall(2, 0);
+	self->getInstance()->requestCloudData(cloudpath);
 
 	return 0;
 }
@@ -225,26 +212,16 @@ int MOAIHusky::_cloudDataSetDownloadCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
 
 	self->SetLocal(state, 2, self->_cloudDataDownloadCallback);
-	
+	self->getInstance()->setObserver(self);
+
 	return 0;
 }
 
 int MOAIHusky::_doTick(lua_State *L) {
 	MOAI_LUA_SETUP(MOAIHusky, "U");
 
+	self->getInstance()->doTick();
 
-/*	if (self->_achievementCallback) {
-		ZLLog::Print ( "Static GameCircle Callback Checking for a callback" );
-		// send outstanding achievement set callbacks.
-		AchievmentCallbacks::iterator i = self->_achievementCallbackList->begin();
-		if (i != self->_achievementCallbackList->end()) {
-		
-
-			self->_achievementCallbackList->erase(i);
-		}
-
-		
-	}*/
 	return 0;
 }
 
@@ -292,21 +269,14 @@ void MOAIHusky::RegisterLuaFuncs ( MOAILuaState& state ) {
 	luaL_register ( state, 0, regTable );
 }
 
-void MOAIHusky::onUpdateProgressCb(AmazonGames::ErrorCode errorCode, const AmazonGames::UpdateProgressResponse* responseStruct, int developerTag) {
+void MOAIHusky::HuskyObserverAchievementCallback(const char *name, bool success) {
 	if (_achievementCallback) {
 		MOAIScopedLuaState state = MOAILuaRuntime::Get ().State ();
 		this->PushLocal ( state, _achievementCallback );
-		state.Push(responseStruct->achievementId);
-		state.Push(errorCode == 0);
+		state.Push(name);
+		state.Push(success);
 		state.DebugCall ( 2, 0 );
-	}		
-/*		AchievementCallback callback;
-		size_t namelength = strlen(responseStruct->achievementId);
-		callback.name = (char*)calloc(sizeof(char), namelength + 1);
-		memcpy(callback.name, responseStruct->achievementId, namelength);
-		callback.success = errorCode == 0;
-		_achievementCallbackList->push_back(callback);
-	}*/
+	}
 }
 
 void MOAIHusky::HuskyObserverLeaderboardScoreSetCallback(const char *name, bool success) {
@@ -353,7 +323,22 @@ void MOAIHusky::HuskyObserverLeaderboardScoreGetCallback(const char *name, Husky
 	state.DebugCall ( 2, 0 );
 }
 
-/*void MOAIHusky::HuskyObserverCloudDataUploaded(const char *path, bool success) {
+void MOAIHusky::HuskyObserverCloudDataDownloaded(const char *cloudfilename, void* buffer, int32_t bytes) {
+	if (!_cloudDataDownloadCallback)
+		return;
+	MOAIScopedLuaState state = MOAILuaRuntime::Get().State ();
+	MOAIDataBuffer *moaibuffer = new MOAIDataBuffer();
+	if (bytes > 0) {
+		moaibuffer->Load(buffer, bytes);
+		moaibuffer->Base64Decode();
+	}
+	this->PushLocal(state, _cloudDataDownloadCallback);
+	state.Push(cloudfilename);
+	state.Push(moaibuffer);
+	state.DebugCall(2, 0);
+}
+
+void MOAIHusky::HuskyObserverCloudDataUploaded(const char *path, bool success) {
 	if (!_cloudDataUploadCallback)
 		return;
 
@@ -362,5 +347,4 @@ void MOAIHusky::HuskyObserverLeaderboardScoreGetCallback(const char *name, Husky
 	state.Push(path);
 	state.Push(success);
 	state.DebugCall(2, 0);
-}*/
-
+}
