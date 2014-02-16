@@ -53,8 +53,8 @@ int MOAIHusky::_setCurrent( lua_State* L ) {
 int MOAIHusky::_hasLeaderboards( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 		
-	state.Push(0);
-	return 0;
+	state.Push(1);
+	return 1;
 }
 
 int MOAIHusky::_hasAchievements( lua_State* L ) {
@@ -123,7 +123,7 @@ int MOAIHusky::_leaderboardUploadScore( lua_State* L ) {
 		update = HuskyLeaderboardScoreToKeepUpdate;
 	}
 
-	ZLLog::Print ( "Static GameCircle Husky provides no functions - leaderboardUploadScore" );	
+	self->getInstance()->uploadLeaderboardScore(name, score, update, data);
 
 	return 0;
 }
@@ -133,8 +133,6 @@ int MOAIHusky::_leaderboardSetScoreCallback( lua_State* L ) {
 	
 	self->getInstance()->setObserver(self);
 	self->SetLocal(state, 2, self->_leaderboardScoreSetCallback);
-
-	ZLLog::Print ( "Static GameCircle Husky provides no functions - leaderboardSetScoreCallback" );	
 	
 	return 0;
 }
@@ -155,8 +153,11 @@ int MOAIHusky::_leaderboardGetScores( lua_State* L ) {
 	else if (strcasecmp(timeframestring, "day"))
 		timeframe = HuskyLeaderboardTodaysScores;
 
-	ZLLog::Print ( "Static GameCircle Husky provides no functions - leaderboardGetScores" );	
-			
+	if (around)
+		self->getInstance()->requestLeaderboardScoresNearPlayer(name, friends, timeframe, offset, number);
+	else
+		self->getInstance()->requestLeaderboardScores(name, friends, timeframe, offset, number);
+	
 	return 0;
 }
 
@@ -165,8 +166,6 @@ int MOAIHusky::_leaderboardSetGetScoresCallback( lua_State* L ) {
 
 	self->getInstance()->setObserver(self);	
 	self->SetLocal(state, 2, self->_leaderboardScoreGetCallback);
-
-	ZLLog::Print ( "Static GameCircle Husky provides no functions - leaderboardSetGetScoresCallback" );	
 	
 	return 0;
 }
@@ -310,13 +309,7 @@ void MOAIHusky::HuskyObserverLeaderboardScoreGetCallback(const char *name, Husky
 		state.Push(entries[i].score);
 		lua_settable(state, -3);
 		state.Push("data");
-		if (entries[i].data != 0) {
-			MOAIDataBuffer *moaibuffer = new MOAIDataBuffer();
-			moaibuffer->Load((void*)&(entries[i].data), 8);
-			state.Push(moaibuffer);
-		} else {
-			state.Push();
-		}
+		state.Push();
 		lua_settable(state, -3);
 		lua_settable(state, -3);
 	}

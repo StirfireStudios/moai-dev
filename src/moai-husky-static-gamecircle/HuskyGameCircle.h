@@ -13,18 +13,44 @@
 
 #include <AchievementsClientInterface.h>
 #include <WhispersyncClientInterface.h>
+#include <LeaderboardsClientInterface.h>
+#include <ProfilesClientInterface.h>
 
 #include <Husky.h>
 
-class ProgressCallback {
+class NamedCallback {
 public:
 	char* name;
 	bool success;
 };
 
-typedef std::vector<ProgressCallback> ProgressCallbackList;
+class LeaderboardPlayerScoreCallback {
+public:
+	char* name;
+	bool success;
+	int rank;
+	long long score;
+};
 
-class HuskyGameCircle : Husky, public AmazonGames::IUpdateProgressCb {
+class LeaderboardScoresCallback {
+public:
+	char* name;
+	int number;
+	HuskyLeaderboardEntry* entries;
+};
+
+typedef std::vector<NamedCallback> NamedCallbackList;
+typedef std::vector<LeaderboardScoresCallback> LeaderboardScoresCallbackList;
+typedef std::vector<LeaderboardPlayerScoreCallback> LeaderboardPlayerScoreCallbackList;
+typedef std::map<int, std::string> LeaderboardTagNameMap;
+typedef std::map<std::string, int> LeaderboardNameTagMap;
+
+class HuskyGameCircle : Husky, 
+	public AmazonGames::IUpdateProgressCb,
+	public AmazonGames::ILeaderboardSubmitScoreCb,
+	public AmazonGames::ILeaderboardGetPlayerScoreCb,
+	public AmazonGames::ILeaderboardGetScoresCb,
+	public AmazonGames::IProfileGetLocalPlayerProfileCb {
 public:
 	HuskyGameCircle();
 	~HuskyGameCircle();
@@ -54,11 +80,31 @@ public:
 
 	void onUpdateProgressCb(AmazonGames::ErrorCode errorCode, const AmazonGames::UpdateProgressResponse* responseStruct, int developerTag);
 
+	void onSubmitScoreCb(AmazonGames::ErrorCode errorCode, const AmazonGames::SubmitScoreResponse* responseStruct, int developerTag);
+
+	void onGetPlayerScoreCb(AmazonGames::ErrorCode errorCode, const AmazonGames::PlayerScoreInfo* responseStruct, int developerTag);
+
+	void onGetScoresCb(AmazonGames::ErrorCode errorCode, const AmazonGames::LeaderboardScores* responseStruct, int developerTag);
+
+	void onGetLocalPlayerProfileCb(AmazonGames::ErrorCode errorCode, const AmazonGames::PlayerInfo* responseStruct, int developerTag);
+
 private:
 	static HuskyGameCircle* instance;
 	HuskyObserver* _observer;
 	AmazonGames::GameDataMap* _cloudDataMap;
-	std::vector<ProgressCallback>* _progressCallbackList;
+	NamedCallbackList* _progressCallbackList;
+	NamedCallbackList* _leaderboardSetCallbackList;
+	LeaderboardTagNameMap* _leaderboardTagNameMap;
+	LeaderboardNameTagMap* _leaderboardNameTagMap;
+	LeaderboardScoresCallbackList* _leaderboardScoresCallbackList;
+	LeaderboardPlayerScoreCallbackList* _leaderboardPlayerScoreCallbackList;
+	int _leaderboardTag;
+	char* _playerId;
+	char* _playerAlias;
+
+	int getLeaderboardTag(const char *name);
+	char* getLeaderboardName(int tag);
+	AmazonGames::LeaderboardFilter getFilterForSettings(bool friends, HuskyLeaderboardScoreTimeFrame timeframe);
 };
 
 #endif /* defined(__libmoai__HuskyGameCircle__) */
