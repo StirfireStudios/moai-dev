@@ -71,6 +71,19 @@ int MOAIHusky::_hasCloudSaves( lua_State* L ) {
 	return 1;
 }
 
+int MOAIHusky::_hasGenericOverlay( lua_State* L) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+
+	state.Push(1);
+	return 1;	
+}
+
+int MOAIHusky::_showGenericOverlay( lua_State* L) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+
+	return 0;	
+}
+
 int MOAIHusky::_achievementReset( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 
@@ -78,7 +91,6 @@ int MOAIHusky::_achievementReset( lua_State* L ) {
 	
 	return 0;
 }
-
 
 int MOAIHusky::_achievementSet( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "US" )
@@ -238,16 +250,25 @@ void MOAIHusky::RegisterLuaClass ( MOAILuaState& state ) {
 		{ "getAvailable",						_getAvailable },
 		{ "getCurrent",							_getCurrent },
 		{ "setCurrent",							_setCurrent },
-		{ "hasLeaderboards",						_hasLeaderboards },
+		{ "hasGenericOverlay",		_hasGenericOverlay },
+		{ "showGenericOverlay",		_showGenericOverlay },
 		{ "hasAchievements",						_hasAchievements },
-		{ "hasCloudSaves",						_hasCloudSaves },
+		//{ "hasAchievementsOverlay",						_hasAchievements },
+		//{ "showAchievementsOverlay",		_showGenericOverlay },
+		//{ "hasAchievementsReset",						_hasAchievements },
 		{ "achievementReset",					_achievementReset },
 		{ "achievementSet",						_achievementSet },
 		{ "achievementSetCallback",				_achievementSetCallback },
+		{ "hasLeaderboards",						_hasLeaderboards },
+		//{ "leaderboardMetadataBytes",		_hasLeaderboards },
+		//{ "hasLeaderboardOverlay",						_hasLeaderboards },
+		//{ "showLeaderboardOverlay",		_showGenericOverlay },
 		{ "leaderboardUploadScore",				_leaderboardUploadScore },
 		{ "leaderboardSetUploadScoreCallback",	_leaderboardSetScoreCallback },
 		{ "leaderboardGetScores",				_leaderboardGetScores },
 		{ "leaderboardSetGetScoresCallback",		_leaderboardSetGetScoresCallback },
+		//{ "hasLeaderboardRangeFetch",						_hasLeaderboards },
+		{ "hasCloudSaves",						_hasCloudSaves },
 		{ "cloudDataUpload",						_cloudDataUpload },
 		{ "cloudDataSetUploadCallback",			_cloudDataSetUploadCallback },
 		{ "cloudDataDownload",					_cloudDataDownload },

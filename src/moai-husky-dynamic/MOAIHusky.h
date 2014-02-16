@@ -39,10 +39,11 @@ private:
 	static int _getAvailable						( lua_State *L );
 	static int _getCurrent						( lua_State *L );
 	static int _setCurrent						( lua_State *L );
-	static int _achievementReset					( lua_State *L );
 	static int _achievementSet					( lua_State *L );
 	static int _achievementSetCallback			( lua_State *L );
 	static int _hasAchievements					( lua_State *L );
+	static int _achievementReset					( lua_State *L );
+	static int _hasAchievementsReset				( lua_State *L );
 	static int _cloudDataUpload					( lua_State *L );
 	static int _cloudDataSetUploadCallback		( lua_State *L );
 	static int _cloudDataDownload				( lua_State *L );

@@ -228,6 +228,17 @@ int MOAIHusky::_hasGenericOverlay( lua_State* L ) {
 	return 1;
 }
 
+int MOAIHusky::_hasAchievementsReset( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+	
+	if (self->_instance == NULL)
+		return 0;
+	
+	state.Push(self->_huskyCapabilities && HuskyHasAchievementReset);
+	return 1;
+}
+
+
 int MOAIHusky::_showGenericOverlay( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "" )
 	
@@ -428,13 +439,13 @@ void MOAIHusky::RegisterLuaClass ( MOAILuaState& state ) {
 		{ "setCurrent",							_setCurrent },
 		{ "hasGenericOverlay",					_hasGenericOverlay },
 		{ "showGenericOverlay",					_showGenericOverlay },
-		//{ "hasAchievementsReset",				_hasAchievements },
-		{ "achievementReset",					_achievementReset },
 		{ "achievementSet",						_achievementSet },
 		{ "achievementSetCallback",				_achievementSetCallback },
 		//{ "showAchievementsOverlay",			_showGenericOverlay },
 		//{ "hasAchievementsOverlay",			_hasAchievements },
 		{ "hasAchievements",						_hasAchievements },
+		{ "achievementReset",					_achievementReset },
+		{ "hasAchievementsReset",				_hasAchievementsReset },
 		{ "cloudDataUpload",						_cloudDataUpload },
 		{ "cloudDataSetUploadCallback",			_cloudDataSetUploadCallback },
 		{ "cloudDataDownload",					_cloudDataDownload },
