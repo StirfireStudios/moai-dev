@@ -39,7 +39,29 @@ void HuskyGameCircle::setObserver(HuskyObserver* observer) {
 }
 
 uint16_t HuskyGameCircle::getCapabilities() {
-	return HuskyHasAchievements;
+	return HuskyHasLeaderboards | HuskyHasAchievements | HuskyHasCloudSaves
+	 | HuskyHasGenericOverlay | HuskyHasAchievementsOverlay | HuskyHasLeaderboardsOverlay
+	 | HuskyHasSingleLeaderboardOverlay;
+}
+
+void HuskyGameCircle::showOverlay() {
+	AmazonGames::GameCircleClientInterface::showGameCircle(NULL, 0);
+}
+
+void HuskyGameCircle::showAchievementsOverlay() {
+	AmazonGames::AchievementsClientInterface::showAchievementsOverlay();
+}
+
+void HuskyGameCircle::showLeaderboardsOverlay() {
+	AmazonGames::LeaderboardsClientInterface::showLeaderboardsOverlay();
+}
+
+void HuskyGameCircle::showLeaderboardOverlay(const char *name) {
+	AmazonGames::LeaderboardsClientInterface::showLeaderboardOverlay(name);
+}
+
+int HuskyGameCircle::leaderboardMetadataByteStorage() {
+	return 0;
 }
 
 void HuskyGameCircle::doTick() {
@@ -61,7 +83,8 @@ void HuskyGameCircle::doTick() {
 	LeaderboardPlayerScoreCallbackList::iterator i1 = _leaderboardPlayerScoreCallbackList->begin();
 	if (i1 != _leaderboardPlayerScoreCallbackList->end()) {
 		if (!i1->success) {
-			_observer->HuskyObserverLeaderboardScoreGetCallback(i1->name, NULL, 0);	
+			_observer->HuskyObserverLeaderboardScoreGetCallback(i1->name, NULL, 0);
+			_leaderboardPlayerScoreCallbackList->erase(i1);
 		} else if (_playerAlias != NULL) {
 			HuskyLeaderboardEntry entry;
 			entry.name = _playerAlias;
@@ -230,3 +253,4 @@ void HuskyGameCircle::onGetLocalPlayerProfileCb(AmazonGames::ErrorCode errorCode
 		memcpy(_playerAlias, responseStruct->alias, length);
 	}
 }
+

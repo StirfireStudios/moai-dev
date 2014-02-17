@@ -15,6 +15,7 @@
 #include <WhispersyncClientInterface.h>
 #include <LeaderboardsClientInterface.h>
 #include <ProfilesClientInterface.h>
+#include <GameCircleClientInterface.h>
 
 #include <Husky.h>
 
@@ -62,11 +63,21 @@ public:
 
 	uint16_t getCapabilities();
 
+	void showOverlay();
+
 	void doTick();
+
+	void showAchievementsOverlay();
 
 	void setAchievement(const char* name);
 
 	void resetAchievements();
+
+	void showLeaderboardsOverlay();
+
+	void showLeaderboardOverlay(const char *name);
+
+	int leaderboardMetadataByteStorage();
 
 	void uploadLeaderboardScore(const char *name, int32_t score, HuskyLeaderboardScoreToKeep tokeep, int64_t extradata);
 

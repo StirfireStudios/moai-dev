@@ -52,36 +52,136 @@ int MOAIHusky::_setCurrent( lua_State* L ) {
 
 int MOAIHusky::_hasLeaderboards( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+
+	if (self->getInstance() != NULL) {
+		state.Push(self->getInstance()->getCapabilities() && HuskyHasLeaderboards);
+		return 1;
+	}
 		
-	state.Push(1);
-	return 1;
+	return 0;
 }
 
 int MOAIHusky::_hasAchievements( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 	
-	state.Push(1);
-	return 1;
+	if (self->getInstance() != NULL) {
+		state.Push(self->getInstance()->getCapabilities() && HuskyHasAchievements);
+		return 1;
+	}
+
+	
+	return 0;
 }
 
 int MOAIHusky::_hasCloudSaves( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 
-	state.Push(1);
+	if (self->getInstance() == NULL)
+		return 0;
+	
+	state.Push(self->getInstance()->getCapabilities() && HuskyHasCloudSaves);
 	return 1;
 }
 
-int MOAIHusky::_hasGenericOverlay( lua_State* L) {
+int MOAIHusky::_hasGenericOverlay( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
-
-	state.Push(1);
-	return 1;	
+	
+	if (self->getInstance() == NULL)
+		return 0;
+	
+	state.Push(self->getInstance()->getCapabilities() && HuskyHasGenericOverlay);
+	return 1;
 }
 
-int MOAIHusky::_showGenericOverlay( lua_State* L) {
+int MOAIHusky::_hasAchievementsOverlay( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+	
+	if (self->getInstance() == NULL)
+		return 0;
+	
+	state.Push(self->getInstance()->getCapabilities() && HuskyHasAchievementsOverlay);
+	return 1;
+}
 
-	return 0;	
+int MOAIHusky::_hasAchievementsReset( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+	
+	if (self->getInstance() == NULL)
+		return 0;
+	
+	state.Push(self->getInstance()->getCapabilities() && HuskyHasAchievementReset);
+	return 1;
+}
+
+int MOAIHusky::_hasLeaderboardRangeFetch( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+	
+	if (self->getInstance() == NULL)
+		return 0;
+	
+	state.Push(self->getInstance()->getCapabilities() && HuskyHasLeaderboardRangeFetch);
+	return 1;
+}
+
+int MOAIHusky::_hasLeaderboardsOverlay( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+	
+	if (self->getInstance() == NULL)
+		return 0;
+	
+	state.Push(self->getInstance()->getCapabilities() && HuskyHasLeaderboardsOverlay);
+	return 1;
+}
+
+int MOAIHusky::_hasSingleLeaderboardOverlay( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+	
+	if (self->getInstance() == NULL)
+		return 0;
+	
+	state.Push(self->getInstance()->getCapabilities() && HuskyHasSingleLeaderboardOverlay);
+	return 1;
+}
+
+int MOAIHusky::_showGenericOverlay( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "" )
+	
+	if (self->getInstance() == NULL)
+		return 0;
+	
+	self->getInstance()->showOverlay();
+	return 0;
+}
+
+int MOAIHusky::_showAchievementsOverlay( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+	
+	if (self->getInstance() == NULL)
+		return 0;
+	
+	self->getInstance()->showAchievementsOverlay();
+	return 0;
+}
+
+int MOAIHusky::_showLeaderboardsOverlay( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+	
+	if (self->getInstance() == NULL)
+		return 0;
+	
+	self->getInstance()->showLeaderboardsOverlay();
+	return 0;
+}
+
+int MOAIHusky::_showSingleLeaderboardOverlay( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "US" )
+	
+	if (self->getInstance() == NULL)
+		return 0;
+	
+	cc8* name = lua_tostring ( state, 2 );
+	self->getInstance()->showLeaderboardOverlay(name);
+	return 0;
 }
 
 int MOAIHusky::_achievementReset( lua_State* L ) {
@@ -108,6 +208,14 @@ int MOAIHusky::_achievementSetCallback( lua_State* L ) {
 	self->SetLocal(state, 2, self->_achievementCallback);
 	
 	return 0;
+}
+
+int MOAIHusky::_leaderboardMetadataBytes( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+	
+	state.Push(self->getInstance()->leaderboardMetadataByteStorage());
+	
+	return 1;
 }
 
 int MOAIHusky::_leaderboardUploadScore( lua_State* L ) {
@@ -250,29 +358,31 @@ void MOAIHusky::RegisterLuaClass ( MOAILuaState& state ) {
 		{ "getAvailable",						_getAvailable },
 		{ "getCurrent",							_getCurrent },
 		{ "setCurrent",							_setCurrent },
-		{ "hasGenericOverlay",		_hasGenericOverlay },
-		{ "showGenericOverlay",		_showGenericOverlay },
-		{ "hasAchievements",						_hasAchievements },
-		//{ "hasAchievementsOverlay",						_hasAchievements },
-		//{ "showAchievementsOverlay",		_showGenericOverlay },
-		//{ "hasAchievementsReset",						_hasAchievements },
-		{ "achievementReset",					_achievementReset },
+		{ "hasGenericOverlay",					_hasGenericOverlay },
+		{ "showGenericOverlay",					_showGenericOverlay },
 		{ "achievementSet",						_achievementSet },
 		{ "achievementSetCallback",				_achievementSetCallback },
-		{ "hasLeaderboards",						_hasLeaderboards },
-		//{ "leaderboardMetadataBytes",		_hasLeaderboards },
-		//{ "hasLeaderboardOverlay",						_hasLeaderboards },
-		//{ "showLeaderboardOverlay",		_showGenericOverlay },
-		{ "leaderboardUploadScore",				_leaderboardUploadScore },
-		{ "leaderboardSetUploadScoreCallback",	_leaderboardSetScoreCallback },
-		{ "leaderboardGetScores",				_leaderboardGetScores },
-		{ "leaderboardSetGetScoresCallback",		_leaderboardSetGetScoresCallback },
-		//{ "hasLeaderboardRangeFetch",						_hasLeaderboards },
-		{ "hasCloudSaves",						_hasCloudSaves },
+		{ "showAchievementsOverlay",				_showAchievementsOverlay },
+		{ "hasAchievementsOverlay",				_hasAchievementsOverlay },
+		{ "hasAchievements",						_hasAchievements },
+		{ "achievementReset",					_achievementReset },
+		{ "hasAchievementsReset",				_hasAchievementsReset },
 		{ "cloudDataUpload",						_cloudDataUpload },
 		{ "cloudDataSetUploadCallback",			_cloudDataSetUploadCallback },
 		{ "cloudDataDownload",					_cloudDataDownload },
 		{ "cloudDataSetDownloadCallback",		_cloudDataSetDownloadCallback },
+		{ "hasCloudSaves",						_hasCloudSaves },
+		{ "hasLeaderboards",						_hasLeaderboards },
+		{ "leaderboardMetadataBytes",			_leaderboardMetadataBytes },
+		{ "leaderboardUploadScore",				_leaderboardUploadScore },
+		{ "leaderboardSetUploadScoreCallback",	_leaderboardSetScoreCallback },
+		{ "leaderboardGetScores",				_leaderboardGetScores },
+		{ "leaderboardSetGetScoresCallback",		_leaderboardSetGetScoresCallback },
+		{ "hasLeaderboardRangeFetch",			_hasLeaderboardRangeFetch },
+		{ "hasLeaderboardsOverlay",				_hasLeaderboardsOverlay },
+		{ "showLeaderboardsOverlay",				_showLeaderboardsOverlay },
+		{ "hasSingleLeaderboardOverlay",			_hasSingleLeaderboardOverlay },
+		{ "showSingleLeaderboardOverlay",		_showSingleLeaderboardOverlay },
 		{ "doTick", _doTick },
 		{ NULL, NULL }
 	};
