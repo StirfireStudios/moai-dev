@@ -63,6 +63,8 @@ public class MoaiKeyboard {
 
 		mKeyInTextView = new EditText ( activity );
 
+		mKeyInTextView.setEnabled(false);
+		mKeyInTextView.setFocusable(false);
 		mKeyInTextView.setText ( "" );
 		mKeyInTextView.setMinLines ( 1 );
 		mKeyInTextView.setMaxLines ( 1 );
@@ -129,6 +131,8 @@ public class MoaiKeyboard {
 	public static void showKeyboard () {
 		sActivity.runOnUiThread( new Runnable () {
 			public void run () {
+				mKeyInTextView.setEnabled(true);
+				mKeyInTextView.setFocusable(true);
 				mInputMethodManager.showSoftInput ( mKeyInTextView, 0 );
 			}
 		});
@@ -139,6 +143,8 @@ public class MoaiKeyboard {
 			public void run () {
 				mKeyInTextView.setText ( "" );
 				mInputMethodManager.hideSoftInputFromWindow ( mKeyInTextView.getWindowToken (), 0 );
+				mKeyInTextView.setEnabled(false);
+				mKeyInTextView.setFocusable(false);				
 			}
 		});
 	}
