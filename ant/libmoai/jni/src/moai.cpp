@@ -37,11 +37,11 @@
 #endif
 
 #if MOAI_WITH_GAME_CIRCLE_HUSKY
-
+	#include <moai-husky-static-gamecircle/host.h>
 #elif MOAI_WITH_GOOGLE_PLAY_HUSKY
-
+	#include <moai-husky-static-stub/host.h>
 #else
-	#include <moai-husky-static-stub/host.h>	
+	#include <moai-husky-static-stub/host.h>
 #endif
 
 //================================================================//

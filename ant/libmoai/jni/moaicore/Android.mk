@@ -23,7 +23,7 @@
 		LOCAL_SRC_FILES += $(wildcard $(MY_MOAI_ROOT)/src/moai-husky-static-gamecircle/*.cpp) 
 	else ifeq ($(HUSKY_TYPE), "googleplay")
 		LOCAL_SRC_FILES += $(wildcard $(MY_MOAI_ROOT)/src/moai-husky-static-stub/*.cpp) 
-	else
+	else ifeq ($(HUSKY_TYPE), "stub")
 		LOCAL_SRC_FILES += $(wildcard $(MY_MOAI_ROOT)/src/moai-husky-static-stub/*.cpp)
 	endif
 
