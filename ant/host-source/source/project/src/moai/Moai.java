@@ -704,6 +704,6 @@ public class Moai {
 
 	//----------------------------------------------------------------//
 	public static void quit () {
-		MoaiLog.i("QUIT!");
+		java.lang.System.exit(0);
 	}	
 }

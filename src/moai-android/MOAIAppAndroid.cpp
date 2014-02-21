@@ -199,14 +199,15 @@ int MOAIAppAndroid::_quit ( lua_State*L ) {
   if ( moai == NULL ) {
 		ZLLog::Print ( "MOAIAppAndroid: Unable to find java class %s", "com/ziplinegames/moai/Moai" );
   } else {
-  	jmethodID share = env->GetStaticMethodID ( moai, "quit", "V" );
-  	if ( share == NULL ) {
+  	jmethodID quit = env->GetStaticMethodID ( moai, "quit", "()V" );
+  	if ( quit == NULL ) {
 			ZLLog::Print ( "MOAIAppAndroid: Unable to find static java method %s", "quit" );
   	} else {
 			env->CallStaticVoidMethod ( moai, quit );
 		}
 	}
 
+	return 0;
 }
 
 
