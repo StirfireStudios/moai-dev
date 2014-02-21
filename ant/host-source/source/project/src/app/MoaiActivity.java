@@ -419,6 +419,7 @@ public class MoaiActivity extends Activity implements ControllerListener {
 		switch(keyCode){
 			// OUYA CODE
 			case OuyaController.BUTTON_O:
+			case KeyEvent.KEYCODE_DPAD_CENTER:
 //			case KeyEvent.KEYCODE_BUTTON_A:
 				Moai.AKUEnqueueKeyboardEvent(1, 3, 0, true);
 				handled = true;
@@ -507,6 +508,7 @@ public class MoaiActivity extends Activity implements ControllerListener {
 		switch(keyCode){
 			// OUYA CODE
 			case OuyaController.BUTTON_O:
+			case KeyEvent.KEYCODE_DPAD_CENTER:			
 				Moai.AKUEnqueueKeyboardEvent(1, 3, 0, false);
 				handled = true;
 				break;
