@@ -12,6 +12,7 @@
 #define __libmoai__MOAIHusky__
 
 #include <Husky.h>
+#include <jni.h>
 #include "HuskyGameCircle.h"
 
 class MOAIHusky : public MOAIGlobalClass <MOAIHusky, MOAILuaObject>, public HuskyObserver {
@@ -69,8 +70,18 @@ public:
 	//----------------------------------------------------------------//
 	void					RegisterLuaClass		( MOAILuaState& state );
 	void					RegisterLuaFuncs		( MOAILuaState& state );
+
+	static bool enabled;
 };
 
 
+//----------------------------------------------------------------//
+extern "C" void Java_com_ziplinegames_moai_Moai_AKUEnableHusky ( JNIEnv* env, jclass obj ) {
+	MOAIHusky::enabled = true;
+}
+
+extern "C" void Java_com_ziplinegames_moai_Moai_AKUDisableHusky ( JNIEnv* env, jclass obj ) {
+	MOAIHusky::enabled = false;
+}
 
 #endif /* defined(__libmoai__MOAIHusky__) */

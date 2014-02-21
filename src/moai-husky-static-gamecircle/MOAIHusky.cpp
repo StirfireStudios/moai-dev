@@ -8,6 +8,8 @@
 
 #include "MOAIHusky.h"
 
+bool MOAIHusky::enabled = false;
+
 MOAIHusky::MOAIHusky() {
 	RTTI_BEGIN
 	RTTI_EXTEND(MOAILuaObject)
@@ -19,7 +21,10 @@ MOAIHusky::~MOAIHusky() {
 }
 
 HuskyGameCircle* MOAIHusky::getInstance() {
-	return HuskyGameCircle::getInstance();
+	if (MOAIHusky::enabled)
+		return HuskyGameCircle::getInstance();
+	else
+		return NULL;
 }
 
 int MOAIHusky::_getAvailable( lua_State* L ) {
@@ -57,7 +62,7 @@ int MOAIHusky::_hasLeaderboards( lua_State* L ) {
 		state.Push((bool)(self->getInstance()->getCapabilities() && HuskyHasLeaderboards));
 	else 
 		state.Push(false);
-		
+
 	return 1;
 }
 
@@ -68,7 +73,7 @@ int MOAIHusky::_hasAchievements( lua_State* L ) {
 		state.Push((bool)(self->getInstance()->getCapabilities() && HuskyHasAchievements));
 	else 
 		state.Push(false);
-	
+
 	return 1;
 }
 
@@ -89,7 +94,7 @@ int MOAIHusky::_hasGenericOverlay( lua_State* L ) {
 		state.Push((bool)(self->getInstance()->getCapabilities() && HuskyHasGenericOverlay));
 	else 
 		state.Push(false);
-	
+
 	return 1;
 }
 
@@ -100,7 +105,7 @@ int MOAIHusky::_hasAchievementsOverlay( lua_State* L ) {
 		state.Push((bool)(self->getInstance()->getCapabilities() && HuskyHasAchievementsOverlay));
 	else 
 		state.Push(false);
-	
+
 	return 1;
 }
 
@@ -133,7 +138,7 @@ int MOAIHusky::_hasLeaderboardsOverlay( lua_State* L ) {
 		state.Push((bool)(self->getInstance()->getCapabilities() && HuskyHasLeaderboardsOverlay));
 	else 
 		state.Push(false);
-	
+
 	return 1;
 }
 
@@ -152,27 +157,25 @@ int MOAIHusky::_showGenericOverlay( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "" )
 	
 	if (self->getInstance() != NULL)
-	self->getInstance()->showOverlay();
+		self->getInstance()->showOverlay();
 	return 0;
 }
 
 int MOAIHusky::_showAchievementsOverlay( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 	
-	if (self->getInstance() == NULL)
-		return 0;
+	if (self->getInstance() != NULL)
+		self->getInstance()->showAchievementsOverlay();
 	
-	self->getInstance()->showAchievementsOverlay();
 	return 0;
 }
 
 int MOAIHusky::_showLeaderboardsOverlay( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 	
-	if (self->getInstance() == NULL)
-		return 0;
-	
-	self->getInstance()->showLeaderboardsOverlay();
+	if (self->getInstance() != NULL)
+		self->getInstance()->showLeaderboardsOverlay();
+
 	return 0;
 }
 
@@ -198,6 +201,9 @@ int MOAIHusky::_achievementReset( lua_State* L ) {
 int MOAIHusky::_achievementSet( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "US" )
 
+	if (self->getInstance() == NULL)
+		return 0;
+
 	cc8* name = lua_tostring ( state, 2 );
 	self->getInstance()->setAchievement(name);
 
@@ -206,6 +212,10 @@ int MOAIHusky::_achievementSet( lua_State* L ) {
 
 int MOAIHusky::_achievementSetCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
+
+	if (self->getInstance() == NULL)
+		return 0;
+
 	
 	self->getInstance()->setObserver(self);
 	self->SetLocal(state, 2, self->_achievementCallback);
@@ -216,6 +226,9 @@ int MOAIHusky::_achievementSetCallback( lua_State* L ) {
 int MOAIHusky::_leaderboardMetadataBytes( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 	
+	if (self->getInstance() == NULL)
+		return 0;
+
 	state.Push(self->getInstance()->leaderboardMetadataByteStorage());
 	
 	return 1;
@@ -223,6 +236,9 @@ int MOAIHusky::_leaderboardMetadataBytes( lua_State* L ) {
 
 int MOAIHusky::_leaderboardUploadScore( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "USNS" )
+
+	if (self->getInstance() == NULL)
+		return 0;
 	
 	cc8* name = lua_tostring ( state, 2 );
 	int32_t score = lua_tointeger( state, 3 );
@@ -253,6 +269,9 @@ int MOAIHusky::_leaderboardUploadScore( lua_State* L ) {
 
 int MOAIHusky::_leaderboardSetScoreCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
+
+	if (self->getInstance() == NULL)
+		return 0;
 	
 	self->getInstance()->setObserver(self);
 	self->SetLocal(state, 2, self->_leaderboardScoreSetCallback);
@@ -262,6 +281,9 @@ int MOAIHusky::_leaderboardSetScoreCallback( lua_State* L ) {
 
 int MOAIHusky::_leaderboardGetScores( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "USBBSNN" )
+
+	if (self->getInstance() == NULL)
+		return 0;
 		
 	cc8* name = state.GetValue<cc8*>(2, 0);
 	bool friends = state.GetValue<bool>(3,0);
@@ -287,6 +309,9 @@ int MOAIHusky::_leaderboardGetScores( lua_State* L ) {
 int MOAIHusky::_leaderboardSetGetScoresCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
 
+	if (self->getInstance() == NULL)
+		return 0;
+
 	self->getInstance()->setObserver(self);	
 	self->SetLocal(state, 2, self->_leaderboardScoreGetCallback);
 	
@@ -295,6 +320,9 @@ int MOAIHusky::_leaderboardSetGetScoresCallback( lua_State* L ) {
 
 int MOAIHusky::_cloudDataUpload( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "US" )
+
+	if (self->getInstance() == NULL)
+		return 0;
 	
 	cc8* cloudpath = state.GetValue<cc8*>(2, 0);
 	MOAIDataBuffer* data = state.GetLuaObject < MOAIDataBuffer >( 3, true );
@@ -310,6 +338,9 @@ int MOAIHusky::_cloudDataUpload( lua_State* L ) {
 int MOAIHusky::_cloudDataSetUploadCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
 	
+	if (self->getInstance() == NULL)
+		return 0;
+
 	self->SetLocal(state, 2, self->_cloudDataUploadCallback);
 	self->getInstance()->setObserver(self);
 	
@@ -318,9 +349,10 @@ int MOAIHusky::_cloudDataSetUploadCallback( lua_State* L ) {
 
 int MOAIHusky::_cloudDataDownload( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "US" )
-	
-	char temp[255];
 
+	if (self->getInstance() == NULL)
+		return 0;
+	
 	if (!self->_cloudDataDownloadCallback)
 		return 0;
 
@@ -333,6 +365,9 @@ int MOAIHusky::_cloudDataDownload( lua_State* L ) {
 int MOAIHusky::_cloudDataSetDownloadCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
 
+	if (self->getInstance() == NULL)
+		return 0;
+
 	self->SetLocal(state, 2, self->_cloudDataDownloadCallback);
 	self->getInstance()->setObserver(self);
 
@@ -341,6 +376,9 @@ int MOAIHusky::_cloudDataSetDownloadCallback( lua_State* L ) {
 
 int MOAIHusky::_doTick(lua_State *L) {
 	MOAI_LUA_SETUP(MOAIHusky, "U");
+
+	if (self->getInstance() == NULL)
+		return 0;
 
 	self->getInstance()->doTick();
 
