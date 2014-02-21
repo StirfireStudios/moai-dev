@@ -513,3 +513,12 @@ void MOAIHusky::HuskyObserverCloudDataUploaded(const char *path, bool success) {
 	state.Push(success);
 	state.DebugCall(2, 0);
 }
+
+//----------------------------------------------------------------//
+extern "C" void Java_com_ziplinegames_moai_Moai_AKUEnableHusky ( JNIEnv* env, jclass obj ) {
+	MOAIHusky::enabled = true;
+}
+
+extern "C" void Java_com_ziplinegames_moai_Moai_AKUDisableHusky ( JNIEnv* env, jclass obj ) {
+	MOAIHusky::enabled = false;
+}

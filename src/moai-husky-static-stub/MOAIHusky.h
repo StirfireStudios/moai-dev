@@ -12,6 +12,7 @@
 #define __libmoai__MOAIHusky__
 
 #include <Husky.h>
+#include <jni.h>
 
 class MOAIHusky : public MOAIGlobalClass <MOAIHusky, MOAILuaObject>, public HuskyObserver {
 private:
@@ -55,7 +56,5 @@ public:
 	void					RegisterLuaClass		( MOAILuaState& state );
 	void					RegisterLuaFuncs		( MOAILuaState& state );
 };
-
-
 
 #endif /* defined(__libmoai__MOAIHusky__) */
