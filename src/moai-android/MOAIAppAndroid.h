@@ -36,6 +36,7 @@ private:
 	static int	_sendMail			( lua_State* L );
 	static int	_setListener		( lua_State* L );
 	static int	_share				( lua_State* L );
+	static int  _quit					( lua_State* L );
 
 public:
 

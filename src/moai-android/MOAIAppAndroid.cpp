@@ -182,6 +182,34 @@ int MOAIAppAndroid::_share ( lua_State* L ) {
 	return 0;
 }
 
+//----------------------------------------------------------------//
+/**	@name	Quit
+	@text Quit the android app cleanly.
+
+	@in nil
+	@out 	nil
+*/
+
+int MOAIAppAndroid::_quit ( lua_State*L ) {
+	MOAILuaState state ( L );
+
+	JNI_GET_ENV ( jvm, env );
+  
+	jclass moai = env->FindClass ( "com/ziplinegames/moai/Moai" );
+  if ( moai == NULL ) {
+		ZLLog::Print ( "MOAIAppAndroid: Unable to find java class %s", "com/ziplinegames/moai/Moai" );
+  } else {
+  	jmethodID share = env->GetStaticMethodID ( moai, "quit", "V" );
+  	if ( share == NULL ) {
+			ZLLog::Print ( "MOAIAppAndroid: Unable to find static java method %s", "quit" );
+  	} else {
+			env->CallStaticVoidMethod ( moai, quit );
+		}
+	}
+
+}
+
+
 //================================================================//
 // MOAIAppAndroid
 //================================================================//
@@ -210,6 +238,7 @@ void MOAIAppAndroid::RegisterLuaClass ( MOAILuaState& state ) {
 		{ "sendMail",				_sendMail },
 		{ "setListener",			_setListener },
 		{ "share",					_share },
+		{ "quit",					_quit },
 		{ NULL, NULL }
 	};
 

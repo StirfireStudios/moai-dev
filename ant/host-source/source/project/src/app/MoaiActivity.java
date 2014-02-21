@@ -279,6 +279,12 @@ public class MoaiActivity extends Activity implements ControllerListener {
 
 		// AMAZON GAME CIRCLE
 		com.amazon.ags.api.AmazonGamesClient.initialize(this, amazonGameCircleCallback, com.amazon.ags.api.AmazonGamesFeature.all());
+		if (amazongamecircleClient != null) {
+			Moai.AKUEnableHusky();
+    } else {
+    	Moai.AKUDisableHusky();
+    }
+
 		Moai.onResume ();
 
 		if ( mAccelerometerListener != null ) {
@@ -567,7 +573,9 @@ public class MoaiActivity extends Activity implements ControllerListener {
 				break;
 			// END OUYA CODE
 			case KeyEvent.KEYCODE_BACK:
-				handled = Moai.backButtonPressed();
+				if (!Moai.backButtonPressed())
+					Moai.AKUEnqueueKeyboardEvent(1, 3, 15, false);
+				handled = true;
 				break;
 		}
 

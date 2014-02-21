@@ -174,6 +174,8 @@ public class Moai {
 	protected static native void 	AKUUntzInit			 			();
 	protected static native void 	AKUUpdate				 		();
   protected static native void  AKUSetDeviceLocale        ( String langCode, String countryCode );
+  public static native void  AKUEnableHusky();
+  public static native void  AKUDisableHusky();
 
 	private static Handler sJoypadHandler = null;
 	private static Runnable sJoypadRunnable = null;
@@ -651,7 +653,7 @@ public class Moai {
 		if ( text != null ) intent.putExtra ( Intent.EXTRA_TEXT, text );
 
 		sActivity.startActivity ( Intent.createChooser ( intent, prompt ));
-	}
+	}	
 
 	//----------------------------------------------------------------//
 	public static void showDialog ( String title, String message, String positiveButton, String neutralButton, String negativeButton, boolean cancelable ) {
@@ -699,4 +701,9 @@ public class Moai {
 			}
 		});
 	}
+
+	//----------------------------------------------------------------//
+	public static void quit () {
+		MoaiLog.i("QUIT!");
+	}	
 }
