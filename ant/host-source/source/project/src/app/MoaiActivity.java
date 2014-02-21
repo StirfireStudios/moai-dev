@@ -570,8 +570,6 @@ public class MoaiActivity extends Activity implements ControllerListener {
 				break;
 			// END OUYA CODE
 			case KeyEvent.KEYCODE_BACK:
-				if (!Moai.backButtonPressed())
-					Moai.AKUEnqueueKeyboardEvent(1, 3, 15, false);
 				handled = true;
 				break;
 		}
