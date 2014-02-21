@@ -187,94 +187,100 @@ int MOAIHusky::_setCurrent( lua_State* L ) {
 
 int MOAIHusky::_hasLeaderboards( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
-
-	if (self->_instance != NULL) {
-		state.Push(self->_huskyCapabilities && HuskyHasLeaderboards);
-		return 1;
-	}
-		
-	return 0;
+	
+	if (self->_instance != NULL)
+		state.Push((bool)(self->_huskyCapabilities && HuskyHasLeaderboards));
+	else
+		state.Push(false);
+	
+	return 1;
 }
 
 int MOAIHusky::_hasAchievements( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 	
-	if (self->_instance != NULL) {
-		state.Push(self->_huskyCapabilities && HuskyHasAchievements);
-		return 1;
-	}
-
+	if (self->_instance != NULL)
+		state.Push((bool)(self->_huskyCapabilities && HuskyHasAchievements));
+	else
+		state.Push(false);
 	
-	return 0;
+	return 1;
 }
 
 int MOAIHusky::_hasCloudSaves( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 
-	if (self->_instance == NULL)
-		return 0;
+	if (self->_instance != NULL)
+		state.Push((bool)(self->_huskyCapabilities && HuskyHasCloudSaves));
+	else
+		state.Push(false);
 	
-	state.Push(self->_huskyCapabilities && HuskyHasCloudSaves);
 	return 1;
 }
 
 int MOAIHusky::_hasGenericOverlay( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 	
-	if (self->_instance == NULL)
-		return 0;
+	if (self->_instance != NULL)
+		state.Push((bool)(self->_huskyCapabilities && HuskyHasGenericOverlay));
+	else
+		state.Push(false);
 	
-	state.Push(self->_huskyCapabilities && HuskyHasGenericOverlay);
 	return 1;
 }
 
 int MOAIHusky::_hasAchievementsOverlay( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 	
-	if (self->_instance == NULL)
-		return 0;
+	if (self->_instance != NULL)
+		state.Push((bool)(self->_huskyCapabilities && HuskyHasAchievementsOverlay));
+	else
+		state.Push(false);
 	
-	state.Push(self->_huskyCapabilities && HuskyHasAchievementsOverlay);
 	return 1;
 }
 
 int MOAIHusky::_hasAchievementsReset( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 	
-	if (self->_instance == NULL)
-		return 0;
+	if (self->_instance != NULL)
+		state.Push((bool)(self->_huskyCapabilities && HuskyHasAchievementReset));
+	else
+		state.Push(false);
 	
-	state.Push(self->_huskyCapabilities && HuskyHasAchievementReset);
 	return 1;
 }
 
 int MOAIHusky::_hasLeaderboardRangeFetch( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 	
-	if (self->_instance == NULL)
-		return 0;
+	if (self->_instance != NULL)
+		state.Push((bool)(self->_huskyCapabilities && HuskyHasLeaderboardRangeFetch));
+	else
+		state.Push(false);
 	
-	state.Push(self->_huskyCapabilities && HuskyHasLeaderboardRangeFetch);
 	return 1;
 }
 
 int MOAIHusky::_hasLeaderboardsOverlay( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 	
-	if (self->_instance == NULL)
-		return 0;
+	if (self->_instance != NULL)
+		state.Push((bool)(self->_huskyCapabilities && HuskyHasLeaderboardsOverlay));
+	else
+		state.Push(false);
 	
-	state.Push(self->_huskyCapabilities && HuskyHasLeaderboardsOverlay);
 	return 1;
 }
 
 int MOAIHusky::_hasSingleLeaderboardOverlay( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 	
-	if (self->_instance == NULL)
-		return 0;
+	if (self->_instance != NULL)
+		state.Push((bool)(self->_huskyCapabilities && HuskyHasSingleLeaderboardOverlay));
+	else
+		state.Push(false);
 	
-	state.Push(self->_huskyCapabilities && HuskyHasSingleLeaderboardOverlay);
 	return 1;
 }
 
