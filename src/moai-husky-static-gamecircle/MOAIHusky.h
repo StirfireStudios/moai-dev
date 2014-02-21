@@ -12,7 +12,6 @@
 #define __libmoai__MOAIHusky__
 
 #include <Husky.h>
-#include <jni.h>
 #include "HuskyGameCircle.h"
 
 class MOAIHusky : public MOAIGlobalClass <MOAIHusky, MOAILuaObject>, public HuskyObserver {
@@ -60,7 +59,8 @@ private:
 	MOAILuaLocal _cloudDataUploadCallback;
 	MOAILuaLocal _cloudDataDownloadCallback;
 
-	HuskyGameCircle* getInstance();
+	HuskyGameCircle* getInstance(MOAIHusky *instance);
+	static HuskyGameCircle* _instance;
 	
 public:
 	DECL_LUA_SINGLETON ( MOAIHusky )
@@ -70,8 +70,6 @@ public:
 	//----------------------------------------------------------------//
 	void					RegisterLuaClass		( MOAILuaState& state );
 	void					RegisterLuaFuncs		( MOAILuaState& state );
-
-	static bool enabled;
 };
 
 

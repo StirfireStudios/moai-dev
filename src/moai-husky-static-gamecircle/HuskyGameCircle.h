@@ -99,6 +99,8 @@ public:
 
 	void onGetLocalPlayerProfileCb(AmazonGames::ErrorCode errorCode, const AmazonGames::PlayerInfo* responseStruct, int developerTag);
 
+	static bool enabled;
+
 private:
 	static HuskyGameCircle* instance;
 	HuskyObserver* _observer;

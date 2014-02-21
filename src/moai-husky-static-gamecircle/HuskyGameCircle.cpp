@@ -1,6 +1,8 @@
 #include "HuskyGameCircle.h"
+#include <jni.h>
 
 HuskyGameCircle* HuskyGameCircle::instance;
+bool HuskyGameCircle::enabled = false;
 
 HuskyGameCircle::HuskyGameCircle():
 	_progressCallbackList(new NamedCallbackList()),
@@ -45,19 +47,23 @@ uint16_t HuskyGameCircle::getCapabilities() {
 }
 
 void HuskyGameCircle::showOverlay() {
-	AmazonGames::GameCircleClientInterface::showGameCircle(NULL, 0);
+	if (HuskyGameCircle::enabled)
+		AmazonGames::GameCircleClientInterface::showGameCircle(NULL, 0);
 }
 
 void HuskyGameCircle::showAchievementsOverlay() {
-	AmazonGames::AchievementsClientInterface::showAchievementsOverlay();
+	if (HuskyGameCircle::enabled)
+		AmazonGames::AchievementsClientInterface::showAchievementsOverlay();
 }
 
 void HuskyGameCircle::showLeaderboardsOverlay() {
-	AmazonGames::LeaderboardsClientInterface::showLeaderboardsOverlay();
+	if (HuskyGameCircle::enabled)
+		AmazonGames::LeaderboardsClientInterface::showLeaderboardsOverlay();
 }
 
 void HuskyGameCircle::showLeaderboardOverlay(const char *name) {
-	AmazonGames::LeaderboardsClientInterface::showLeaderboardOverlay(name);
+	if (HuskyGameCircle::enabled)
+		AmazonGames::LeaderboardsClientInterface::showLeaderboardOverlay(name);
 }
 
 int HuskyGameCircle::leaderboardMetadataByteStorage() {
@@ -94,7 +100,8 @@ void HuskyGameCircle::doTick() {
 			_observer->HuskyObserverLeaderboardScoreGetCallback(i1->name, &entry, 1);	
 			_leaderboardPlayerScoreCallbackList->erase(i1);
 		} else {
-			AmazonGames::ProfilesClientInterface::getLocalPlayerProfile(this, 0);
+			if (HuskyGameCircle::enabled)
+				AmazonGames::ProfilesClientInterface::getLocalPlayerProfile(this, 0);
 		}
 	}
 
@@ -106,7 +113,8 @@ void HuskyGameCircle::doTick() {
 }
 
 void HuskyGameCircle::setAchievement(const char* name) {
-	AmazonGames::AchievementsClientInterface::updateProgress(name, 100, this, 0);
+	if (HuskyGameCircle::enabled)
+		AmazonGames::AchievementsClientInterface::updateProgress(name, 100, this, 0);
 }
 
 void HuskyGameCircle::resetAchievements() {
@@ -150,22 +158,30 @@ AmazonGames::LeaderboardFilter HuskyGameCircle::getFilterForSettings(bool friend
 
 void HuskyGameCircle::uploadLeaderboardScore(const char *name, int32_t score, HuskyLeaderboardScoreToKeep tokeep, int64_t extradata) {
 	int tag = getLeaderboardTag(name);
-	AmazonGames::LeaderboardsClientInterface::submitScore(name, score, this, tag);
+	if (HuskyGameCircle::enabled)
+		AmazonGames::LeaderboardsClientInterface::submitScore(name, score, this, tag);
 }
 
 void HuskyGameCircle::requestLeaderboardScores(const char *name, bool friends, HuskyLeaderboardScoreTimeFrame timeframe, int offset, int number) {
 	int tag = getLeaderboardTag(name);
 	AmazonGames::LeaderboardFilter filter;
-	AmazonGames::LeaderboardsClientInterface::getScores(name, filter, this, tag);
+	if (HuskyGameCircle::enabled)
+		AmazonGames::LeaderboardsClientInterface::getScores(name, filter, this, tag);
 }
 
 void HuskyGameCircle::requestLeaderboardScoresNearPlayer(const char *name, bool friends, HuskyLeaderboardScoreTimeFrame timeframe, int offset, int number) {
 	int tag = getLeaderboardTag(name);
 	AmazonGames::LeaderboardFilter filter;
-	AmazonGames::LeaderboardsClientInterface::getPlayerScore(name, filter, this, tag);
+	if (HuskyGameCircle::enabled)
+		AmazonGames::LeaderboardsClientInterface::getPlayerScore(name, filter, this, tag);
 }
 
 void HuskyGameCircle::uploadCloudData(const char *cloudfilename, void* data, int32_t bytes) {
+	if (!HuskyGameCircle::enabled) {
+		_observer->HuskyObserverCloudDataUploaded(cloudfilename, false);
+		return;
+	}
+
 	if (_cloudDataMap == NULL)
 			_cloudDataMap = AmazonGames::WhispersyncClient::getGameData();
 
@@ -175,6 +191,11 @@ void HuskyGameCircle::uploadCloudData(const char *cloudfilename, void* data, int
 }
 
 void HuskyGameCircle::requestCloudData(const char *cloudfilename) {
+	if (!HuskyGameCircle::enabled) {
+		_observer->HuskyObserverCloudDataDownloaded(cloudfilename, NULL, 0);	
+		return;
+	}
+
 	if (_cloudDataMap == NULL)
 			_cloudDataMap = AmazonGames::WhispersyncClient::getGameData();
 
@@ -254,3 +275,11 @@ void HuskyGameCircle::onGetLocalPlayerProfileCb(AmazonGames::ErrorCode errorCode
 	}
 }
 
+//----------------------------------------------------------------//
+extern "C" void Java_com_ziplinegames_moai_Moai_AKUEnableHusky ( JNIEnv* env, jclass obj ) {
+	HuskyGameCircle::enabled = true;
+}
+
+extern "C" void Java_com_ziplinegames_moai_Moai_AKUDisableHusky ( JNIEnv* env, jclass obj ) {
+	HuskyGameCircle::enabled = false;
+}

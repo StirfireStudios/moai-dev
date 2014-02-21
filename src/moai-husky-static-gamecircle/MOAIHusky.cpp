@@ -8,23 +8,19 @@
 
 #include "MOAIHusky.h"
 
-bool MOAIHusky::enabled = false;
+HuskyGameCircle* MOAIHusky::_instance = NULL;
 
 MOAIHusky::MOAIHusky() {
 	RTTI_BEGIN
 	RTTI_EXTEND(MOAILuaObject)
 	RTTI_END
+
+	_instance = HuskyGameCircle::getInstance();
+	_instance->setObserver(this);
 }
 
 MOAIHusky::~MOAIHusky() {
 	HuskyGameCircle::shutdownInstance();
-}
-
-HuskyGameCircle* MOAIHusky::getInstance() {
-	if (MOAIHusky::enabled)
-		return HuskyGameCircle::getInstance();
-	else
-		return NULL;
 }
 
 int MOAIHusky::_getAvailable( lua_State* L ) {
@@ -58,10 +54,7 @@ int MOAIHusky::_setCurrent( lua_State* L ) {
 int MOAIHusky::_hasLeaderboards( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 
-	if (self->getInstance() != NULL)
-		state.Push((bool)(self->getInstance()->getCapabilities() && HuskyHasLeaderboards));
-	else 
-		state.Push(false);
+	state.Push((bool)(self->_instance->getCapabilities() && HuskyHasLeaderboards));
 
 	return 1;
 }
@@ -69,10 +62,7 @@ int MOAIHusky::_hasLeaderboards( lua_State* L ) {
 int MOAIHusky::_hasAchievements( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 	
-	if (self->getInstance() != NULL)
-		state.Push((bool)(self->getInstance()->getCapabilities() && HuskyHasAchievements));
-	else 
-		state.Push(false);
+	state.Push((bool)(self->_instance->getCapabilities() && HuskyHasAchievements));
 
 	return 1;
 }
@@ -80,20 +70,15 @@ int MOAIHusky::_hasAchievements( lua_State* L ) {
 int MOAIHusky::_hasCloudSaves( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 
-	if (self->getInstance() != NULL)
-		state.Push((bool)(self->getInstance()->getCapabilities() && HuskyHasCloudSaves));
-	else 
-		state.Push(false);
+	state.Push((bool)self->_instance->getCapabilities() && HuskyHasCloudSaves);
+
 	return 1;
 }
 
 int MOAIHusky::_hasGenericOverlay( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 	
-	if (self->getInstance() != NULL)
-		state.Push((bool)(self->getInstance()->getCapabilities() && HuskyHasGenericOverlay));
-	else 
-		state.Push(false);
+	state.Push((bool)(self->_instance->getCapabilities() && HuskyHasGenericOverlay));
 
 	return 1;
 }
@@ -101,10 +86,7 @@ int MOAIHusky::_hasGenericOverlay( lua_State* L ) {
 int MOAIHusky::_hasAchievementsOverlay( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 	
-	if (self->getInstance() != NULL)
-		state.Push((bool)(self->getInstance()->getCapabilities() && HuskyHasAchievementsOverlay));
-	else 
-		state.Push(false);
+	state.Push((bool)(self->_instance->getCapabilities() && HuskyHasAchievementsOverlay));
 
 	return 1;
 }
@@ -112,10 +94,7 @@ int MOAIHusky::_hasAchievementsOverlay( lua_State* L ) {
 int MOAIHusky::_hasAchievementsReset( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 	
-	if (self->getInstance() != NULL)
-		state.Push((bool)(self->getInstance()->getCapabilities() && HuskyHasAchievementReset));
-	else 
-		state.Push(false);
+	state.Push((bool)(self->_instance->getCapabilities() && HuskyHasAchievementReset));
 	
 	return 1;
 }
@@ -123,10 +102,7 @@ int MOAIHusky::_hasAchievementsReset( lua_State* L ) {
 int MOAIHusky::_hasLeaderboardRangeFetch( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 	
-	if (self->getInstance() != NULL)
-		state.Push((bool)(self->getInstance()->getCapabilities() && HuskyHasLeaderboardRangeFetch));
-	else 
-		state.Push(false);
+	state.Push((bool)(self->_instance->getCapabilities() && HuskyHasLeaderboardRangeFetch));
 	
 	return 1;
 }
@@ -134,10 +110,7 @@ int MOAIHusky::_hasLeaderboardRangeFetch( lua_State* L ) {
 int MOAIHusky::_hasLeaderboardsOverlay( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 	
-	if (self->getInstance() != NULL)
-		state.Push((bool)(self->getInstance()->getCapabilities() && HuskyHasLeaderboardsOverlay));
-	else 
-		state.Push(false);
+	state.Push((bool)(self->_instance->getCapabilities() && HuskyHasLeaderboardsOverlay));
 
 	return 1;
 }
@@ -145,10 +118,7 @@ int MOAIHusky::_hasLeaderboardsOverlay( lua_State* L ) {
 int MOAIHusky::_hasSingleLeaderboardOverlay( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 	
-	if (self->getInstance() != NULL)
-		state.Push((bool)(self->getInstance()->getCapabilities() && HuskyHasSingleLeaderboardOverlay));
-	else 
-		state.Push(false);
+	state.Push((bool)(self->_instance->getCapabilities() && HuskyHasSingleLeaderboardOverlay));
 	
 	return 1;
 }
@@ -156,37 +126,32 @@ int MOAIHusky::_hasSingleLeaderboardOverlay( lua_State* L ) {
 int MOAIHusky::_showGenericOverlay( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "" )
 	
-	if (self->getInstance() != NULL)
-		self->getInstance()->showOverlay();
+	self->_instance->showOverlay();
+
 	return 0;
 }
 
 int MOAIHusky::_showAchievementsOverlay( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 	
-	if (self->getInstance() != NULL)
-		self->getInstance()->showAchievementsOverlay();
+	self->_instance->showAchievementsOverlay();
 	
 	return 0;
 }
 
 int MOAIHusky::_showLeaderboardsOverlay( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
-	
-	if (self->getInstance() != NULL)
-		self->getInstance()->showLeaderboardsOverlay();
+
+	self->_instance->showLeaderboardsOverlay();
 
 	return 0;
 }
 
 int MOAIHusky::_showSingleLeaderboardOverlay( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "US" )
-	
-	if (self->getInstance() == NULL)
-		return 0;
-	
+		
 	cc8* name = lua_tostring ( state, 2 );
-	self->getInstance()->showLeaderboardOverlay(name);
+	self->_instance->showLeaderboardOverlay(name);
 	return 0;
 }
 
@@ -201,11 +166,8 @@ int MOAIHusky::_achievementReset( lua_State* L ) {
 int MOAIHusky::_achievementSet( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "US" )
 
-	if (self->getInstance() == NULL)
-		return 0;
-
 	cc8* name = lua_tostring ( state, 2 );
-	self->getInstance()->setAchievement(name);
+	self->_instance->setAchievement(name);
 
 	return 0;
 }
@@ -213,11 +175,6 @@ int MOAIHusky::_achievementSet( lua_State* L ) {
 int MOAIHusky::_achievementSetCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
 
-	if (self->getInstance() == NULL)
-		return 0;
-
-	
-	self->getInstance()->setObserver(self);
 	self->SetLocal(state, 2, self->_achievementCallback);
 	
 	return 0;
@@ -226,19 +183,13 @@ int MOAIHusky::_achievementSetCallback( lua_State* L ) {
 int MOAIHusky::_leaderboardMetadataBytes( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 	
-	if (self->getInstance() == NULL)
-		return 0;
-
-	state.Push(self->getInstance()->leaderboardMetadataByteStorage());
+	state.Push(self->_instance->leaderboardMetadataByteStorage());
 	
 	return 1;
 }
 
 int MOAIHusky::_leaderboardUploadScore( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "USNS" )
-
-	if (self->getInstance() == NULL)
-		return 0;
 	
 	cc8* name = lua_tostring ( state, 2 );
 	int32_t score = lua_tointeger( state, 3 );
@@ -262,18 +213,14 @@ int MOAIHusky::_leaderboardUploadScore( lua_State* L ) {
 		update = HuskyLeaderboardScoreToKeepUpdate;
 	}
 
-	self->getInstance()->uploadLeaderboardScore(name, score, update, data);
+	self->_instance->uploadLeaderboardScore(name, score, update, data);
 
 	return 0;
 }
 
 int MOAIHusky::_leaderboardSetScoreCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
-
-	if (self->getInstance() == NULL)
-		return 0;
 	
-	self->getInstance()->setObserver(self);
 	self->SetLocal(state, 2, self->_leaderboardScoreSetCallback);
 	
 	return 0;
@@ -281,9 +228,6 @@ int MOAIHusky::_leaderboardSetScoreCallback( lua_State* L ) {
 
 int MOAIHusky::_leaderboardGetScores( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "USBBSNN" )
-
-	if (self->getInstance() == NULL)
-		return 0;
 		
 	cc8* name = state.GetValue<cc8*>(2, 0);
 	bool friends = state.GetValue<bool>(3,0);
@@ -299,9 +243,9 @@ int MOAIHusky::_leaderboardGetScores( lua_State* L ) {
 		timeframe = HuskyLeaderboardTodaysScores;
 
 	if (around)
-		self->getInstance()->requestLeaderboardScoresNearPlayer(name, friends, timeframe, offset, number);
+		self->_instance->requestLeaderboardScoresNearPlayer(name, friends, timeframe, offset, number);
 	else
-		self->getInstance()->requestLeaderboardScores(name, friends, timeframe, offset, number);
+		self->_instance->requestLeaderboardScores(name, friends, timeframe, offset, number);
 	
 	return 0;
 }
@@ -309,10 +253,6 @@ int MOAIHusky::_leaderboardGetScores( lua_State* L ) {
 int MOAIHusky::_leaderboardSetGetScoresCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
 
-	if (self->getInstance() == NULL)
-		return 0;
-
-	self->getInstance()->setObserver(self);	
 	self->SetLocal(state, 2, self->_leaderboardScoreGetCallback);
 	
 	return 0;
@@ -320,9 +260,6 @@ int MOAIHusky::_leaderboardSetGetScoresCallback( lua_State* L ) {
 
 int MOAIHusky::_cloudDataUpload( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "US" )
-
-	if (self->getInstance() == NULL)
-		return 0;
 	
 	cc8* cloudpath = state.GetValue<cc8*>(2, 0);
 	MOAIDataBuffer* data = state.GetLuaObject < MOAIDataBuffer >( 3, true );
@@ -330,19 +267,15 @@ int MOAIHusky::_cloudDataUpload( lua_State* L ) {
 	char* stringData = (char*)calloc(sizeof(char), data->getBuffer()->Size() + 1);
 	memcpy(stringData, data->getBuffer()->Data(), data->getBuffer()->Size());
 
-	self->getInstance()->uploadCloudData(cloudpath, stringData, strlen(stringData));
+	self->_instance->uploadCloudData(cloudpath, stringData, strlen(stringData));
 
 	return 0;
 }
 
 int MOAIHusky::_cloudDataSetUploadCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
-	
-	if (self->getInstance() == NULL)
-		return 0;
 
 	self->SetLocal(state, 2, self->_cloudDataUploadCallback);
-	self->getInstance()->setObserver(self);
 	
 	return 0;
 }
@@ -350,14 +283,11 @@ int MOAIHusky::_cloudDataSetUploadCallback( lua_State* L ) {
 int MOAIHusky::_cloudDataDownload( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "US" )
 
-	if (self->getInstance() == NULL)
-		return 0;
-	
 	if (!self->_cloudDataDownloadCallback)
 		return 0;
 
 	cc8* cloudpath = state.GetValue<cc8*>(2, 0);
-	self->getInstance()->requestCloudData(cloudpath);
+	self->_instance->requestCloudData(cloudpath);
 
 	return 0;
 }
@@ -365,11 +295,7 @@ int MOAIHusky::_cloudDataDownload( lua_State* L ) {
 int MOAIHusky::_cloudDataSetDownloadCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
 
-	if (self->getInstance() == NULL)
-		return 0;
-
 	self->SetLocal(state, 2, self->_cloudDataDownloadCallback);
-	self->getInstance()->setObserver(self);
 
 	return 0;
 }
@@ -377,10 +303,7 @@ int MOAIHusky::_cloudDataSetDownloadCallback( lua_State* L ) {
 int MOAIHusky::_doTick(lua_State *L) {
 	MOAI_LUA_SETUP(MOAIHusky, "U");
 
-	if (self->getInstance() == NULL)
-		return 0;
-
-	self->getInstance()->doTick();
+	self->_instance->doTick();
 
 	return 0;
 }
@@ -489,8 +412,10 @@ void MOAIHusky::HuskyObserverLeaderboardScoreGetCallback(const char *name, Husky
 }
 
 void MOAIHusky::HuskyObserverCloudDataDownloaded(const char *cloudfilename, void* buffer, int32_t bytes) {
+	ZLLog::Print("Got download callback");
 	if (!_cloudDataDownloadCallback)
 		return;
+	ZLLog::Print("There is a callback into lualand");
 	MOAIScopedLuaState state = MOAILuaRuntime::Get().State ();
 	MOAIDataBuffer *moaibuffer = new MOAIDataBuffer();
 	if (bytes > 0) {
@@ -512,13 +437,4 @@ void MOAIHusky::HuskyObserverCloudDataUploaded(const char *path, bool success) {
 	state.Push(path);
 	state.Push(success);
 	state.DebugCall(2, 0);
-}
-
-//----------------------------------------------------------------//
-extern "C" void Java_com_ziplinegames_moai_Moai_AKUEnableHusky ( JNIEnv* env, jclass obj ) {
-	MOAIHusky::enabled = true;
-}
-
-extern "C" void Java_com_ziplinegames_moai_Moai_AKUDisableHusky ( JNIEnv* env, jclass obj ) {
-	MOAIHusky::enabled = false;
 }
