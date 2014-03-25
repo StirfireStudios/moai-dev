@@ -10,10 +10,13 @@ HuskyGameCircle::HuskyGameCircle():
 	_observer(NULL),
 	_cloudDataMap(NULL),
 	_leaderboardTag(0),
+	_achievementTag(0),
 	_leaderboardTagNameMap(new LeaderboardTagNameMap()),
 	_leaderboardNameTagMap(new LeaderboardNameTagMap()),
 	_leaderboardScoresCallbackList(new LeaderboardScoresCallbackList()),
 	_leaderboardPlayerScoreCallbackList(new LeaderboardPlayerScoreCallbackList()),
+	_achievementTagNameMap(new AchievementTagNameMap()),
+	_achievementNameTagMap(new AchievementNameTagMap()),
 	_playerId(NULL),
 	_playerAlias(NULL) {
 }
@@ -22,6 +25,8 @@ HuskyGameCircle::~HuskyGameCircle() {
 	delete(_progressCallbackList);
 	delete(_leaderboardNameTagMap);
 	delete(_leaderboardTagNameMap);
+	delete(_achievementNameTagMap);
+	delete(_achievementTagNameMap);
 }
 
 HuskyGameCircle* HuskyGameCircle::getInstance() {
@@ -113,8 +118,10 @@ void HuskyGameCircle::doTick() {
 }
 
 void HuskyGameCircle::setAchievement(const char* name) {
-	if (HuskyGameCircle::enabled)
-		AmazonGames::AchievementsClientInterface::updateProgress(name, 100, this, 0);
+	if (HuskyGameCircle::enabled) {
+		int tag = this->getAchievementTag(name);
+		AmazonGames::AchievementsClientInterface::updateProgress(name, 100, this, tag);
+	}
 }
 
 void HuskyGameCircle::resetAchievements() {
@@ -135,9 +142,31 @@ int HuskyGameCircle::getLeaderboardTag(const char *name) {
 	return tag;
 }
 
+int HuskyGameCircle::getAchievementTag(const char *name) {
+	int tag;
+	AchievementNameTagMap::iterator value = _achievementNameTagMap->find(name);
+	if (value == _achievementNameTagMap->end()) {
+		_achievementNameTagMap->insert(AchievementNameTagMap::value_type(name, _achievementTag));
+		_achievementTagNameMap->insert(AchievementTagNameMap::value_type(_achievementTag, name));
+		tag = _achievementTag;
+		_achievementTag++;
+	} else {
+		tag = value->second;
+	}
+	return tag;
+}
+
 char* HuskyGameCircle::getLeaderboardName(int tag) {
 	LeaderboardTagNameMap::iterator value = _leaderboardTagNameMap->find(tag);
 	if (value != _leaderboardTagNameMap->end())
+		return (char*)value->second.c_str();
+	else
+		return NULL;
+}
+
+char* HuskyGameCircle::getAchievementName(int tag) {
+	AchievementTagNameMap::iterator value = _achievementTagNameMap->find(tag);
+	if (value != _achievementTagNameMap->end())
 		return (char*)value->second.c_str();
 	else
 		return NULL;
@@ -210,9 +239,7 @@ void HuskyGameCircle::requestCloudData(const char *cloudfilename) {
 /* AMAZON CALLBACKS */
 void HuskyGameCircle::onUpdateProgressCb(AmazonGames::ErrorCode errorCode, const AmazonGames::UpdateProgressResponse* responseStruct, int developerTag) {
 	NamedCallback callback;
-	size_t namelength = strlen(responseStruct->achievementId);
-	callback.name = (char*)calloc(sizeof(char), namelength + 1);
-	memcpy(callback.name, responseStruct->achievementId, namelength);
+	callback.name = this->getAchievementName(developerTag);
 	callback.success = errorCode == 0;
 	_progressCallbackList->push_back(callback);
 }

@@ -45,6 +45,8 @@ typedef std::vector<LeaderboardScoresCallback> LeaderboardScoresCallbackList;
 typedef std::vector<LeaderboardPlayerScoreCallback> LeaderboardPlayerScoreCallbackList;
 typedef std::map<int, std::string> LeaderboardTagNameMap;
 typedef std::map<std::string, int> LeaderboardNameTagMap;
+typedef std::map<int, std::string> AchievementTagNameMap;
+typedef std::map<std::string, int> AchievementNameTagMap;
 
 class HuskyGameCircle : Husky, 
 	public AmazonGames::IUpdateProgressCb,
@@ -111,12 +113,17 @@ private:
 	LeaderboardNameTagMap* _leaderboardNameTagMap;
 	LeaderboardScoresCallbackList* _leaderboardScoresCallbackList;
 	LeaderboardPlayerScoreCallbackList* _leaderboardPlayerScoreCallbackList;
+	AchievementTagNameMap* _achievementTagNameMap;
+	AchievementNameTagMap* _achievementNameTagMap;	
 	int _leaderboardTag;
+	int _achievementTag;
 	char* _playerId;
 	char* _playerAlias;
 
 	int getLeaderboardTag(const char *name);
+	int getAchievementTag(const char *name);
 	char* getLeaderboardName(int tag);
+	char* getAchievementName(int tag);
 	AmazonGames::LeaderboardFilter getFilterForSettings(bool friends, HuskyLeaderboardScoreTimeFrame timeframe);
 };
 
