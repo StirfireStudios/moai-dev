@@ -253,9 +253,8 @@ void MOAIInputMgr::Update () {
 
 	u32 total = this->mInput.GetCursor ();
 	this->Reset ();
-	
-	while ( this->mInput.GetCursor () < total ) {
-	
+
+	while ( (this->mInput.GetCursor () + 3) < total ) {
 		u8 deviceID		= this->mInput.Read < u8 >( 0 );
 		u8 sensorID		= this->mInput.Read < u8 >( 0 );
 		//u32 type		= ( u32 )this->mInput.Read < u8 >();
