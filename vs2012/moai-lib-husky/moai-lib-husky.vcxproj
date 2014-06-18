@@ -658,11 +658,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\moai-husky\MOAIHusky.cpp" />
+    <ClInclude Include="..\..\src\moai-husky-dynamic\MOAIHusky.h" />
+    <ClInclude Include="..\..\src\moai-husky\pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\moai-husky\MOAIHusky.h" />
-    <ClInclude Include="..\..\src\moai-husky\pch.h" />
+    <ClCompile Include="..\..\src\moai-husky-dynamic\MOAIHusky.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
