@@ -6,7 +6,7 @@
 #if defined(_WIN32) || defined(_WIN64)
 	#include <cstdint>
 #elif defined(__APPLE__)
-	#include <tr1/cstdint>
+	#include <cstdint>
 #endif
 #include <string>
 
