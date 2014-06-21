@@ -13,6 +13,8 @@ class MOAITransformBase;
 #define		OPENGL_PREPROC		"#define LOWP\n #define MEDP\n"
 #define		OPENGL_ES_PREPROC	"#define LOWP lowp\n #define MEDP mediump\n"
 
+#define		WEBGL_PREPROC "precision mediump int;\n precision mediump float;\n"
+
 //================================================================//
 // MOAIShaderUniform
 //================================================================//
@@ -40,7 +42,9 @@ private:
 	void		BindPenColor				( float r, float g, float b, float a );
 	void		BindPipelineTransforms		( const ZLMatrix4x4& world, const ZLMatrix4x4& view, const ZLMatrix4x4& proj );
 	void		Clear						();
-	void		SetBuffer					( void* buffer, size_t size );
+	void		GetValue					( MOAIAttrOp& attrOp );
+	void        SetAttrFlags                ( MOAIAttrOp& attrOp );
+    void		SetBuffer					( void* buffer, size_t size );
 	void		SetType						( u32 type );
 	void		SetValue					( float value );
 	void		SetValue					( int value );

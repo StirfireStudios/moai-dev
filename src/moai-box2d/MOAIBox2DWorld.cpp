@@ -12,6 +12,7 @@
 #include <moai-box2d/MOAIBox2DFrictionJoint.h>
 #include <moai-box2d/MOAIBox2DGearJoint.h>
 #include <moai-box2d/MOAIBox2DJoint.h>
+#include <moai-box2d/MOAIBox2DMotorJoint.h>
 #include <moai-box2d/MOAIBox2DMouseJoint.h>
 #include <moai-box2d/MOAIBox2DPrismaticJoint.h>
 #include <moai-box2d/MOAIBox2DPulleyJoint.h>
@@ -93,7 +94,7 @@ int MOAIBox2DWorld::_addBody ( lua_State* L ) {
 	@in		number anchorB_Y	in units, in world coordinates, converted to meters
 	@opt	number frequencyHz			in Hz. Default value determined by Box2D
 	@opt	number dampingRatio			Default value determined by Box2D
-	@opt	number collideConnected		Default value is false
+	@opt	boolean collideConnected		Default value is false
 	@out	MOAIBox2DJoint joint
 */
 int	MOAIBox2DWorld::_addDistanceJoint ( lua_State* L ) {
@@ -127,6 +128,8 @@ int	MOAIBox2DWorld::_addDistanceJoint ( lua_State* L ) {
 	MOAIBox2DDistanceJoint* joint = new MOAIBox2DDistanceJoint ();
 	joint->SetJoint ( self->mWorld->CreateJoint ( &jointDef ));
 	joint->SetWorld ( self );
+	joint->LuaRetain ( bodyA );
+	joint->LuaRetain ( bodyB );
 	self->LuaRetain ( joint );
 	
 	joint->PushLuaUserdata ( state );
@@ -175,6 +178,8 @@ int	MOAIBox2DWorld::_addFrictionJoint ( lua_State* L ) {
 	MOAIBox2DFrictionJoint* joint = new MOAIBox2DFrictionJoint ();
 	joint->SetJoint ( self->mWorld->CreateJoint ( &jointDef ));
 	joint->SetWorld ( self );
+	joint->LuaRetain ( bodyA );
+	joint->LuaRetain ( bodyB );
 	self->LuaRetain ( joint );
 	
 	joint->PushLuaUserdata ( state );
@@ -225,6 +230,42 @@ int	MOAIBox2DWorld::_addGearJoint ( lua_State* L ) {
 }
 
 //----------------------------------------------------------------//
+/** @name	addMotorJoint
+	@text	Create and add a joint to the world. See Box2D documentation.
+	
+	@in		MOAIBox2DWorld self
+	@in		MOAIBox2DBody bodyA
+	@in		MOAIBox2DBody bodyB
+	@out	MOAIBox2DJoint joint
+*/
+int MOAIBox2DWorld::_addMotorJoint ( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIBox2DWorld, "UUU" )
+
+	if ( self->IsLocked ()) {
+		MOAILog ( state, MOAILogMessages::MOAIBox2DWorld_IsLocked );
+		return 0;
+	}
+	
+	MOAIBox2DBody* bodyA = state.GetLuaObject < MOAIBox2DBody >( 2, true );
+	MOAIBox2DBody* bodyB = state.GetLuaObject < MOAIBox2DBody >( 3, true );
+	
+	if ( !( bodyA && bodyB )) return 0;
+	
+	b2MotorJointDef jointDef;
+	jointDef.Initialize ( bodyA->mBody, bodyB->mBody );
+	
+	MOAIBox2DMotorJoint* joint = new MOAIBox2DMotorJoint ();
+	joint->SetJoint ( self->mWorld->CreateJoint ( &jointDef ));
+	joint->SetWorld ( self );
+	joint->LuaRetain ( bodyA );
+	joint->LuaRetain ( bodyB );
+	self->LuaRetain ( joint );
+	
+	joint->PushLuaUserdata ( state );
+	return 1;
+}
+
+//----------------------------------------------------------------//
 /**	@name	addMouseJoint
 	@text	Create and add a joint to the world. See Box2D documentation.
 	
@@ -266,6 +307,8 @@ int	MOAIBox2DWorld::_addMouseJoint ( lua_State* L ) {
 	MOAIBox2DMouseJoint* joint = new MOAIBox2DMouseJoint ();
 	joint->SetJoint ( self->mWorld->CreateJoint ( &jointDef ));
 	joint->SetWorld ( self );
+	joint->LuaRetain ( bodyA );
+	joint->LuaRetain ( bodyB );
 	self->LuaRetain ( joint );
 	
 	joint->PushLuaUserdata ( state );
@@ -312,6 +355,8 @@ int	MOAIBox2DWorld::_addPrismaticJoint ( lua_State* L ) {
 	MOAIBox2DPrismaticJoint* joint = new MOAIBox2DPrismaticJoint ();
 	joint->SetJoint ( self->mWorld->CreateJoint ( &jointDef ));
 	joint->SetWorld ( self );
+	joint->LuaRetain ( bodyA );
+	joint->LuaRetain ( bodyB );
 	self->LuaRetain ( joint );
 	
 	joint->PushLuaUserdata ( state );
@@ -378,6 +423,8 @@ int	MOAIBox2DWorld::_addPulleyJoint ( lua_State* L ) {
 	MOAIBox2DPulleyJoint* joint = new MOAIBox2DPulleyJoint ();
 	joint->SetJoint ( self->mWorld->CreateJoint ( &jointDef ));
 	joint->SetWorld ( self );
+	joint->LuaRetain ( bodyA );
+	joint->LuaRetain ( bodyB );
 	self->LuaRetain ( joint );
 	
 	joint->PushLuaUserdata ( state );
@@ -418,6 +465,8 @@ int	MOAIBox2DWorld::_addRevoluteJoint ( lua_State* L ) {
 	MOAIBox2DRevoluteJoint* joint = new MOAIBox2DRevoluteJoint ();
 	joint->SetJoint ( self->mWorld->CreateJoint ( &jointDef ));
 	joint->SetWorld ( self );
+	joint->LuaRetain ( bodyA );
+	joint->LuaRetain ( bodyB );
 	self->LuaRetain ( joint );
 	
 	joint->PushLuaUserdata ( state );
@@ -436,7 +485,7 @@ int	MOAIBox2DWorld::_addRevoluteJoint ( lua_State* L ) {
  @opt		number anchorAY		in units, in world coordinates, converted to meters
  @opt		number anchorBX		in units, in world coordinates, converted to meters
  @opt		number anchorBY		in units, in world coordinates, converted to meters
- @opt		number collideConnected		Default value is false		
+ @opt		boolean collideConnected		Default value is false		
  @out	MOAIBox2DJoint joint
  */
 int	MOAIBox2DWorld::_addRopeJoint ( lua_State* L ) {
@@ -470,6 +519,8 @@ int	MOAIBox2DWorld::_addRopeJoint ( lua_State* L ) {
 	MOAIBox2DRopeJoint* joint = new MOAIBox2DRopeJoint ();
 	joint->SetJoint ( self->mWorld->CreateJoint ( &jointDef ));
 	joint->SetWorld ( self );
+	joint->LuaRetain ( bodyA );
+	joint->LuaRetain ( bodyB );
 	self->LuaRetain ( joint );
 	
 	joint->PushLuaUserdata ( state );
@@ -511,6 +562,8 @@ int	MOAIBox2DWorld::_addWeldJoint ( lua_State* L ) {
 	MOAIBox2DWeldJoint* joint = new MOAIBox2DWeldJoint ();
 	joint->SetJoint ( self->mWorld->CreateJoint ( &jointDef ));
 	joint->SetWorld ( self );
+	joint->LuaRetain ( bodyA );
+	joint->LuaRetain ( bodyB );
 	self->LuaRetain ( joint );
 	
 	joint->PushLuaUserdata ( state );
@@ -557,6 +610,8 @@ int	MOAIBox2DWorld::_addWheelJoint ( lua_State* L ) {
 	MOAIBox2DWheelJoint* joint = new MOAIBox2DWheelJoint ();
 	joint->SetJoint ( self->mWorld->CreateJoint ( &jointDef ));
 	joint->SetWorld ( self );
+	joint->LuaRetain ( bodyA );
+	joint->LuaRetain ( bodyB );
 	self->LuaRetain ( joint );
 	
 	joint->PushLuaUserdata ( state );
@@ -682,7 +737,7 @@ int MOAIBox2DWorld::_setAutoClearForces ( lua_State* L ) {
 	@text	enable/disable debug drawing.
  
 	@in		MOAIBox2DWorld self
-	@in		number bEnable
+	@in		boolean enable
 	@out	nil
 */
 int MOAIBox2DWorld::_setDebugDrawEnabled ( lua_State* L ) {
@@ -905,7 +960,7 @@ MOAIBox2DWorld::MOAIBox2DWorld () :
 	this->mWorld = new b2World ( gravity);
 	this->mWorld->SetContactListener ( this->mArbiter );
 	this->mWorld->SetDestructionListener ( this );
-	this->mWorld->SetAllowSleeping(true);
+	this->mWorld->SetAllowSleeping ( true );
 	this->mDebugDraw = new MOAIBox2DDebugDraw ();
 	this->mWorld->SetDebugDraw ( this->mDebugDraw );
 	
@@ -974,6 +1029,7 @@ void MOAIBox2DWorld::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "addDistanceJoint",			_addDistanceJoint },
 		{ "addFrictionJoint",			_addFrictionJoint },
 		{ "addGearJoint",				_addGearJoint },
+		{ "addMotorJoint", 				_addMotorJoint },
 		{ "addMouseJoint",				_addMouseJoint },
 		{ "addPrismaticJoint",			_addPrismaticJoint },
 		{ "addPulleyJoint",				_addPulleyJoint },
@@ -995,6 +1051,7 @@ void MOAIBox2DWorld::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "setLinearSleepTolerance",	_setLinearSleepTolerance },
 		{ "setTimeToSleep",				_setTimeToSleep },
 		{ "setUnitsToMeters",			_setUnitsToMeters },
+	  	{ "getRayCast",                                 _getRayCast },
 		{ NULL, NULL }
 	};
 	
@@ -1054,4 +1111,55 @@ void MOAIBox2DWorld::ScheduleDestruction ( MOAIBox2DJoint& joint ) {
 		joint.mDestroy = true;
 	}
 	this->Destroy ();
+}
+
+//----------------------------------------------------------------//
+/**     @name   getRayCast
+        @text   return RayCast 1st point hit
+       
+        @in		MOAIBox2DWorld self
+        @in		number p1x
+        @in		number p1y
+        @in		number p2x
+        @in		number p2y
+        @out	boolean hit					true if hit, false otherwise
+		@out	MOAIBox2DFixture fixture	the fixture that was hit, or nil
+        @out	number hitpointX
+        @out	number hitpointY
+*/
+int MOAIBox2DWorld::_getRayCast ( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIBox2DWorld, "U" )
+	float p1x=state.GetValue < float >( 2, 0 );
+	float p1y=state.GetValue < float >( 3, 0 );
+	float p2x=state.GetValue < float >( 4, 0 );
+	float p2y=state.GetValue < float >( 5, 0 );
+ 
+	b2Vec2 p1(p1x,p1y);
+	b2Vec2 p2(p2x,p2y);
+   
+	MOAIBox2DRayCastCallback callback;
+	self->mWorld->RayCast(&callback, p1, p2);
+ 
+	if (NULL != callback.m_fixture) {
+		b2Vec2 hitpoint = callback.m_point;
+
+		lua_pushboolean ( state, true );
+		lua_pushnumber ( state, hitpoint.x / self->mUnitsToMeters );
+		lua_pushnumber ( state, hitpoint.y / self->mUnitsToMeters );
+
+		// Raycast hit a fixture
+		MOAIBox2DFixture* moaiFixture = ( MOAIBox2DFixture* ) callback.m_fixture->GetUserData ();
+		if ( moaiFixture ) {
+			moaiFixture->PushLuaUserdata ( state );
+			return 4;
+		} else {
+			return 3;
+		}
+
+	} else {
+
+		// Raycast did not hit a fixture
+		lua_pushboolean( state, false );
+		return 1;
+	}
 }

@@ -62,7 +62,7 @@ Int64 OggAudioSource::setDecoderPosition(Int64 startFrame)
 {
 	RScopedLock l(&mDecodeLock);
 
-	int status = ov_pcm_seek(&mOggFile, startFrame * getNumChannels());
+	ov_pcm_seek(&mOggFile, startFrame * getNumChannels());
 	if(startFrame < getLength() * getSampleRate())
 		mEOF = false;
 	return ov_pcm_tell(&mOggFile);

@@ -5,6 +5,9 @@
 #include <moai-core/MOAILogMgr.h>
 #include <moai-core/MOAILogMessages.h>
 
+#include <moai-core/MOAILuaState-impl.h>
+#include <moai-core/MOAILuaClass-impl.h>
+
 //================================================================//
 // helpers
 //================================================================//
@@ -94,8 +97,7 @@ int MOAILogMgr::_log ( lua_State* L ) {
 		ZLLog::PrintFile ( ZLLog::CONSOLE, msg );
 	#else
 		ZLLog::Print ( msg );
-	#endif
-	
+	#endif	
 	return 0;
 }
 

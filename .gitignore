@@ -4,6 +4,7 @@ Thumbs.db
 /vs2010/ipch
 /vs2010/bin
 /vs2008/bin
+
 *.ipch
 *.sdf
 UpgradeLog*
@@ -31,6 +32,7 @@ src/moai/moai
 release
 tmp
 
+
 #extra visual studio junk
 *.obj
 *.lib
@@ -43,4 +45,8 @@ ant/ouya-host/
 
 # Produced by test runner
 test/xml-results
+.idea
+cmake/projects/
 
+bin/api-reference-parser/vendor
+docs/api-reference

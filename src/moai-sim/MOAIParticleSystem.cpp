@@ -66,6 +66,7 @@ int MOAIParticleSystem::_clearSprites ( lua_State* L ) {
 	@text	Returns a particle state for an index or nil if none exists.
 	
 	@in		MOAIParticleSystem self
+	@in		number index
 	@out	MOAIParticleState state
 */
 int MOAIParticleSystem::_getState ( lua_State* L ) {
@@ -435,7 +436,7 @@ MOAIParticleState* MOAIParticleSystem::GetState ( u32 id ) {
 AKUParticleSprite* MOAIParticleSystem::GetTopSprite () {
 
 	if ( this->mSpriteTop ) {
-		u32 idx = this->mSpriteTop - 1;
+		u32 idx = (this->mSpriteTop - 1) % this->mSprites.Size();
 		return &this->mSprites [ idx ];
 	}
 	return 0;

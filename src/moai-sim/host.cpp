@@ -9,23 +9,17 @@
 // aku
 //================================================================//
 
-static bool sIsInitialized = false;
-
 //----------------------------------------------------------------//
-void AKUDetectGfxContext () {
-
-	MOAIGfxDevice::Get ().DetectContext ();
+void AKUSimAppFinalize () {
 }
 
 //----------------------------------------------------------------//
-void AKUFinalizeSim () {
-	
-	if ( !sIsInitialized ) return;
-	sIsInitialized = false;
+void AKUSimAppInitialize () {
 }
 
 //----------------------------------------------------------------//
-void AKUEnqueueButtonEvent ( int deviceID, int sensorID, bool down ) {
+void AKUSimContextInitialize () {
+	//MOAIProfiler::Affirm ();
 
 	MOAIInputMgr::Get ().EnqueueButtonEvent (( u8 )deviceID, ( u8 )sensorID, down );
 }
@@ -160,6 +154,7 @@ void AKUInitializeSim () {
 	REGISTER_LUA_CLASS ( MOAIGridDeck2D )
 	REGISTER_LUA_CLASS ( MOAIGridSpace )
 	REGISTER_LUA_CLASS ( MOAIGridPathGraph )
+	REGISTER_LUA_CLASS ( MOAIGridFancy )
 	REGISTER_LUA_CLASS ( MOAIImage )
 	REGISTER_LUA_CLASS ( MOAIImageTexture )
 	REGISTER_LUA_CLASS ( MOAIIndexBuffer )
@@ -228,6 +223,96 @@ void AKUInitializeSim () {
 }
 
 //----------------------------------------------------------------//
+void AKUDetectGfxContext () {
+
+	MOAIGfxDevice::Get ().DetectContext ();
+}
+
+//----------------------------------------------------------------//
+void AKUEnqueueButtonEvent ( int deviceID, int sensorID, bool down ) {
+
+	MOAIInputMgr::Get ().EnqueueButtonEvent (( u8 )deviceID, ( u8 )sensorID, down );
+}
+
+//----------------------------------------------------------------//
+void AKUEnqueueCompassEvent ( int deviceID, int sensorID, float heading ) {
+
+	MOAIInputMgr::Get ().EnqueueCompassEvent (( u8 )deviceID, ( u8 )sensorID, heading );
+}
+
+//----------------------------------------------------------------//
+void AKUEnqueueJoystickEvent( int deviceID, int sensorID, float x, float y ) {
+
+	MOAIInputMgr::Get ().EnqueueJoystickEvent(( u8 )deviceID, ( u8 )sensorID, x, y );
+}
+
+//----------------------------------------------------------------//
+void AKUEnqueueKeyboardAltEvent ( int deviceID, int sensorID, bool down ) {
+
+	MOAIInputMgr::Get ().EnqueueKeyboardEvent (( u8 )deviceID, ( u8 )sensorID, MOAIKeyCodes::ALT, down );
+}
+
+//----------------------------------------------------------------//
+void AKUEnqueueKeyboardControlEvent ( int deviceID, int sensorID, bool down ) {
+
+	MOAIInputMgr::Get ().EnqueueKeyboardEvent (( u8 )deviceID, ( u8 )sensorID, MOAIKeyCodes::CONTROL, down );
+}
+
+//----------------------------------------------------------------//
+void AKUEnqueueKeyboardEvent ( int deviceID, int sensorID, int keyID, bool down ) {
+
+	MOAIInputMgr::Get ().EnqueueKeyboardEvent (( u8 )deviceID, ( u8 )sensorID, keyID, down );
+}
+
+//----------------------------------------------------------------//
+void AKUEnqueueKeyboardShiftEvent ( int deviceID, int sensorID, bool down ) {
+
+	MOAIInputMgr::Get ().EnqueueKeyboardEvent (( u8 )deviceID, ( u8 )sensorID, MOAIKeyCodes::SHIFT, down );
+}
+
+//----------------------------------------------------------------//
+void AKUEnqueueLevelEvent ( int deviceID, int sensorID, float x, float y, float z ) {
+
+	MOAIInputMgr::Get ().EnqueueLevelEvent (( u8 )deviceID, ( u8 )sensorID, x, y, z );
+}
+
+//----------------------------------------------------------------//
+void AKUEnqueueLocationEvent ( int deviceID, int sensorID, double longitude, double latitude, double altitude, float hAccuracy, float vAccuracy, float speed ) {
+
+	MOAIInputMgr::Get ().EnqueueLocationEvent (( u8 )deviceID, ( u8 )sensorID, longitude, latitude, altitude, hAccuracy, vAccuracy, speed );
+}
+
+//----------------------------------------------------------------//
+void AKUEnqueuePointerEvent ( int deviceID, int sensorID, int x, int y ) {
+
+	MOAIInputMgr::Get ().EnqueuePointerEvent (( u8 )deviceID, ( u8 )sensorID, x, y );
+}
+
+//----------------------------------------------------------------//
+void AKUEnqueueTouchEvent ( int deviceID, int sensorID, int touchID, bool down, float x, float y ) {
+
+	MOAIInputMgr::Get ().EnqueueTouchEvent (( u8 )deviceID, ( u8 )sensorID, ( u32 )touchID, down, x, y );
+}
+
+//----------------------------------------------------------------//
+void AKUEnqueueTouchEventCancel ( int deviceID, int sensorID ) {
+
+	MOAIInputMgr::Get ().EnqueueTouchEventCancel (( u8 )deviceID, ( u8 )sensorID );
+}
+
+//----------------------------------------------------------------//
+void AKUEnqueueWheelEvent ( int deviceID, int sensorID, float value ) {
+
+	MOAIInputMgr::Get ().EnqueueWheelEvent (( u8 )deviceID, ( u8 )sensorID, value );
+}
+
+//----------------------------------------------------------------//
+double AKUGetSimStep () {
+
+	return MOAISim::Get ().GetStep ();
+}
+
+//----------------------------------------------------------------//
 void AKUPause ( bool pause ) {
 
 	if ( pause ) {
@@ -272,6 +357,18 @@ void AKUSetFunc_EnterFullscreenMode ( AKUEnterFullscreenModeFunc func ) {
 void AKUSetFunc_ExitFullscreenMode ( AKUExitFullscreenModeFunc func ) {
 
 	MOAISim::Get ().SetExitFullscreenModeFunc ( func );
+}
+
+//----------------------------------------------------------------//
+void AKUSetFunc_ShowCursor ( AKUShowCursorFunc func ) {
+
+	MOAISim::Get ().SetShowCursorFunc ( func );
+}
+
+//----------------------------------------------------------------//
+void AKUSetFunc_HideCursor ( AKUHideCursorFunc func ) {
+
+	MOAISim::Get ().SetHideCursorFunc ( func );
 }
 
 //----------------------------------------------------------------//

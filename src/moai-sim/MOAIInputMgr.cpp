@@ -53,7 +53,7 @@ void MOAIInputMgr::EnqueueCompassEvent ( u8 deviceID, u8 sensorID, float heading
 
 //----------------------------------------------------------------//
 void MOAIInputMgr::EnqueueJoystickEvent( u8 deviceID, u8 sensorID, float x, float y ) {
-	
+
 	if ( this->CheckSensor ( deviceID, sensorID, MOAISensor::JOYSTICK )) {
 		this->WriteEventHeader ( deviceID, sensorID, MOAISensor::JOYSTICK );
 		MOAIJoystickSensor::WriteEvent ( this->mInput, x, y );
@@ -232,7 +232,7 @@ void MOAIInputMgr::SetDeviceActive ( u8 deviceID, bool active ) {
 
 //----------------------------------------------------------------//
 void MOAIInputMgr::SetDeviceExtendedName ( u8 deviceID, cc8* nameExtended ) {
-	
+
 	MOAIInputDevice* device = this->GetDevice ( deviceID );
 	if ( device ) {
 		device->SetExtendedName(nameExtended);
@@ -253,7 +253,7 @@ void MOAIInputMgr::Update () {
 
 	u32 total = this->mInput.GetCursor ();
 	this->Reset ();
-
+    // Why plus 3? because there has to be a MINIMUM of 3 bytes inside the buffer for us to read succesfully
 	while ( (this->mInput.GetCursor () + 3) < total ) {
 		u8 deviceID		= this->mInput.Read < u8 >( 0 );
 		u8 sensorID		= this->mInput.Read < u8 >( 0 );

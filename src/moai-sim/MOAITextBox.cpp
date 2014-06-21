@@ -142,6 +142,23 @@ int MOAITextBox::_getRect ( lua_State* L ) {
 }
 
 //----------------------------------------------------------------//
+/**	@name	getString
+	@text	Return the text string.
+
+	@in		MOAITextBox self
+	@out	string text			Text string.
+*/
+int MOAITextBox::_getString ( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAITextBox, "U" )
+
+	if ( self->mText ) {
+		lua_pushstring ( state, self->mText );
+		return 1;
+	}
+	return 0;
+}
+
+//----------------------------------------------------------------//
 /**	@name	getStringBounds
 	@text	Returns the bounding rectangle of a given substring on a
 			single line in the local space of the text box.
@@ -225,6 +242,7 @@ int MOAITextBox::_more ( lua_State* L ) {
 	@text	Advances to the next page of text (if any) or wraps to the start of the text (if at end).
 
 	@in		MOAITextBox self
+	@opt	boolean reveal		Default is true
 	@out	nil
 */
 int MOAITextBox::_nextPage ( lua_State* L ) {
@@ -302,6 +320,7 @@ int MOAITextBox::_setAlignment ( lua_State* L ) {
 	@overload
 		
 		@in		MOAITextBox self
+		@out	nil
 */
 int MOAITextBox::_setCurve ( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAITextBox, "U" )
@@ -446,6 +465,22 @@ int MOAITextBox::_setReveal ( lua_State* L ) {
 }
 
 //----------------------------------------------------------------//
+/**	@name	setSnapToViewportScale
+	@text	If set to true text positions will snap to integers according to the viewport scale. Default value is true.
+
+	@in		MOAITextBox self
+	@in		boolean snap				Whether text positions should snap to viewport scale
+	@out	nil
+*/
+int MOAITextBox::_setSnapToViewportScale ( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAITextBox, "UB" )
+	
+	self->mSnapToViewportScale = state.GetValue < bool >( 2, self->mSnapToViewportScale );
+	
+	return 0;
+}
+
+//----------------------------------------------------------------//
 /**	@name	setSpeed
 	@text	Sets the base spool speed used when creating a spooling MOAIAction with the spool() function.
 
@@ -547,7 +582,7 @@ int MOAITextBox::_setWordBreak ( lua_State* L ) {
 			Y moves up the screen).
 
 	@in		MOAITextBox self
-	@in		number yFlip				Whether the vertical rendering direction should be inverted.
+	@in		boolean yFlip				Whether the vertical rendering direction should be inverted.
 	@out	nil
 */
 int MOAITextBox::_setYFlip ( lua_State* L ) {
@@ -1102,6 +1137,7 @@ MOAITextBox::MOAITextBox () :
 	mReveal ( REVEAL_ALL ),
 	mYFlip ( false ),
 	mGlyphScale ( 1.0f ),
+	mSnapToViewportScale ( true ),
 	mCurrentPageIdx ( 0 ),
 	mNextPageIdx ( 0 ),
 	mNeedsLayout ( false ),
@@ -1124,16 +1160,6 @@ MOAITextBox::~MOAITextBox () {
 
 	this->ClearCurves ();
 	this->ClearHighlights ();
-	
-	// TODO: this is a known bug - releasing the dep links here
-	// will cause plenty o' crashing
-	// the case seems to be when the text box has ben garbage
-	// collected but is still in the node manager's update list
-	// the lua ref stuff is destroyed by the __gc method
-	// but it's needed by the links
-	// am wondering if the links are also being orphaned or
-	// compromised by the gc
-	
 	this->ResetLayout ();
 	this->ResetStyleMap ();
 	this->ResetStyleSet ();
@@ -1295,6 +1321,7 @@ void MOAITextBox::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "getGlyphScale",			_getGlyphScale },
 		{ "getLineSpacing",			_getLineSpacing },
 		{ "getRect",				_getRect },
+		{ "getString",				_getString },
 		{ "getStringBounds",		_getStringBounds },
 		{ "getStyle",				_getStyle },
 		{ "more",					_more },
@@ -1308,6 +1335,7 @@ void MOAITextBox::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "setLineSpacing",			_setLineSpacing },
 		{ "setRect",				_setRect },
 		{ "setReveal",				_setReveal },
+		{ "setSnapToViewportScale",	_setSnapToViewportScale },
 		{ "setSpeed",				_setSpeed },
 		{ "setString",				_setString },
 		{ "setStyle",				_setStyle },

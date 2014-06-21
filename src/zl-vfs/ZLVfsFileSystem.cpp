@@ -201,7 +201,7 @@ size_t ZLVfsFileSystem::ComparePaths ( const char* p0, const char* p1 ) {
 
 //----------------------------------------------------------------//
 ZLVfsVirtualPath* ZLVfsFileSystem::FindBestVirtualPath ( char const* path ) {
-
+	
 	size_t len = 0;
 	size_t bestlen = 0;
 	ZLVfsVirtualPath* best = 0;
@@ -212,7 +212,7 @@ ZLVfsVirtualPath* ZLVfsFileSystem::FindBestVirtualPath ( char const* path ) {
 		const char* test = cursor->mPath.c_str ();
 		len = ComparePaths ( test, path );
 	
-		if ((( !test [ len ]) || ( path [ len ] == 0 )) && ( len > bestlen )) {
+		if (( test [ len ] == 0 ) && ( len > bestlen )) {
 			best = cursor;
 			bestlen = len;
 		}		
@@ -359,13 +359,17 @@ std::string ZLVfsFileSystem::GetWorkingPath () {
 void ZLVfsFileSystem::Init () {
 
 	this->mMutex = zl_mutex_create ();;
-
-	char buffer [ FILENAME_MAX ];
-
-	char* result = getcwd ( buffer, FILENAME_MAX );
-	assert ( result );
 	
-	this->mWorkingPath = this->NormalizeDirPath ( buffer );
+	#ifdef ANDROID
+		this->mWorkingPath = this->NormalizeDirPath ( "/" );
+	#else
+		char buffer [ FILENAME_MAX ];
+	
+		char* result = getcwd ( buffer, FILENAME_MAX );
+		assert ( result );
+		
+		this->mWorkingPath = this->NormalizeDirPath ( buffer );
+	#endif
 }
 
 //----------------------------------------------------------------//

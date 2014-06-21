@@ -23,17 +23,19 @@ import android.widget.TextView;
 
 // These are necessary for the mKeyInTextView hack
 import android.widget.EditText;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.Editable;
+
 
 //================================================================//
 // MoaiLog
 //================================================================//
 public class MoaiKeyboard {
 	
-	private static Activity sActivity = null;
+	private static Activity mActivity = null;
 	private static EditText mKeyInTextView = null;
-
+	
 	protected static native void AKUNotifyKeyEvent ();
 	protected static native void AKUNotifyTextDone ();
 
@@ -42,21 +44,21 @@ public class MoaiKeyboard {
 
 	private static String mKeyString = new String ();
 
-	private static Context sContext;
+	private static Context mContext;
 	private static InputMethodManager mInputMethodManager;
 
 	private static LinearLayoutIMETrap mContainer;
 	
 	//----------------------------------------------------------------//
 	public static void onCreate ( Activity activity ) {
-		sActivity = activity;
-		sContext = activity;
+		mActivity = activity;
+		mContext = activity;
 		
 		// input manager is used to pop up the native Android keyboard as needed
-		mInputMethodManager = ( InputMethodManager ) sContext.getSystemService ( Context.INPUT_METHOD_SERVICE );
+		mInputMethodManager = ( InputMethodManager ) mContext.getSystemService ( Context.INPUT_METHOD_SERVICE );
 		
 		// Our main container holds the EGL view as well as our fake TextEdit view for keyboard entry ..
-		mContainer = ( LinearLayoutIMETrap ) new LinearLayoutIMETrap ( sContext );
+		mContainer = ( LinearLayoutIMETrap ) new LinearLayoutIMETrap ( mContext );
 		mContainer.setLayoutParams ( new LinearLayout.LayoutParams ( LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT ));
 		mContainer.setOrientation ( LinearLayout.VERTICAL );
 		mContainer.setMainActivity ( activity );
@@ -93,7 +95,7 @@ public class MoaiKeyboard {
 				return false;
 			}
 		});
-
+		
 		// Create the fake EditText, and push it outside the margins so that its not visible.
 		LinearLayout.LayoutParams paramsKeyInTextView = new LinearLayout.LayoutParams ( LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT );
 
@@ -128,18 +130,36 @@ public class MoaiKeyboard {
 		return mKeyString;
 	}
 	
-	public static void showKeyboard () {
-		sActivity.runOnUiThread( new Runnable () {
-			public void run () {
-				mKeyInTextView.setEnabled(true);
-				mKeyInTextView.setFocusable(true);
-				mInputMethodManager.showSoftInput ( mKeyInTextView, 0 );
-			}
-		});
+    public static void _showKeyboard ( final int inputType ) {
+         mActivity.runOnUiThread( new Runnable () {
+             public void run () {
+                 mKeyInTextView.setInputType( inputType );
+                 mInputMethodManager.showSoftInput ( mKeyInTextView, 0 );
+             }
+         });
+     }
+    public static void showKeyboard () {
+        showTextKeyboard();
+     }
+	
+	public static void showTextKeyboard() {
+		_showKeyboard( InputType.TYPE_CLASS_TEXT );
+	}
+	
+	public static void showNumberKeyboard() {
+	    _showKeyboard( InputType.TYPE_CLASS_NUMBER );
+	}
+	
+	public static void showDateTimeKeyboard() {
+	    _showKeyboard( InputType.TYPE_CLASS_DATETIME );
+	}
+	
+	public static void showPhoneKeyboard() {
+	    _showKeyboard( InputType.TYPE_CLASS_PHONE );
 	}
 
 	public static void hideKeyboard () {
-		sActivity.runOnUiThread( new Runnable () {
+		mActivity.runOnUiThread( new Runnable () {
 			public void run () {
 				mKeyInTextView.setText ( "" );
 				mInputMethodManager.hideSoftInputFromWindow ( mKeyInTextView.getWindowToken (), 0 );
@@ -150,7 +170,7 @@ public class MoaiKeyboard {
 	}
 		
 	public static void setText ( final String text ) {
-		sActivity.runOnUiThread( new Runnable () {
+		mActivity.runOnUiThread( new Runnable () {
 			public void run () {
 				mKeyInTextView.setText ( text );
 				mKeyInTextView.setSelection ( text.length ());

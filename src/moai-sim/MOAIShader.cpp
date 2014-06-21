@@ -135,6 +135,42 @@ void MOAIShaderUniform::Clear () {
 }
 
 //----------------------------------------------------------------//
+void MOAIShaderUniform::GetValue ( MOAIAttrOp& attrOp ) {
+
+	switch ( this->mType ) {
+			
+		case UNIFORM_FLOAT: {
+			
+			attrOp.Apply ( this->mFloat, MOAIAttrOp::GET, MOAIAttrOp::ATTR_READ_WRITE );
+			break;
+		}
+		case UNIFORM_INT: {
+			
+			attrOp.Apply ( this->mInt, MOAIAttrOp::GET, MOAIAttrOp::ATTR_READ_WRITE );
+			break;
+		}
+	}
+}
+
+//----------------------------------------------------------------//
+void MOAIShaderUniform::SetAttrFlags ( MOAIAttrOp& attrOp ) {
+    
+	switch ( this->mType ) {
+			
+		case UNIFORM_FLOAT:
+		case UNIFORM_INT:
+			
+			attrOp.SetFlags ( MOAIAttrOp::ATTR_READ_WRITE );
+            break;
+
+        default:
+
+            attrOp.SetFlags ( MOAIAttrOp::ATTR_WRITE );
+            break;
+	}
+}
+
+//----------------------------------------------------------------//
 MOAIShaderUniform::MOAIShaderUniform () :
 	mAddr ( 0 ),
 	mType ( UNIFORM_NONE ),
@@ -499,8 +535,8 @@ bool MOAIShader::ApplyAttrOp ( u32 attrID, MOAIAttrOp& attrOp, u32 op ) {
 	if ( attrID >= this->mUniforms.Size ()) return false;
 
 	if ( op == MOAIAttrOp::CHECK ) {
-		attrOp.SetFlags ( MOAIAttrOp::ATTR_WRITE );
-		return true;
+		this->mUniforms [ attrID ].SetAttrFlags ( attrOp );
+        return true;
 	}
 	
 	if ( op == MOAIAttrOp::SET ) {
@@ -510,6 +546,11 @@ bool MOAIShader::ApplyAttrOp ( u32 attrID, MOAIAttrOp& attrOp, u32 op ) {
 	
 	if ( op == MOAIAttrOp::ADD ) {
 		this->mUniforms [ attrID ].AddValue ( attrOp );
+		return true;
+	}
+    
+    if ( op == MOAIAttrOp::GET ) {
+		this->mUniforms [ attrID ].GetValue ( attrOp );
 		return true;
 	}
 	
@@ -545,12 +586,18 @@ u32 MOAIShader::CompileShader ( u32 type, cc8* source ) {
 
 	u32 shader = zglCreateShader ( type );
 
-	cc8* sources [ 2 ];
+	cc8* sources [ 3 ];
 
 	sources [ 0 ] = gfxDevice.IsOpenGLES () ? OPENGL_ES_PREPROC : OPENGL_PREPROC;
-	sources [ 1 ] = source;
+	if ((type == ZGL_SHADER_TYPE_FRAGMENT) && gfxDevice.IsOpenGLES() ) {
+		sources [ 1 ] = WEBGL_PREPROC;
+	} else {
+		sources [ 1 ] = " ";
+	}
 
-	zglShaderSource ( shader, 2, sources, NULL );
+	sources [ 2 ] = source;
+
+	zglShaderSource ( shader, 3, sources, NULL );
 	zglCompileShader ( shader );
 
 	s32 status;
@@ -690,13 +737,13 @@ void MOAIShader::OnCreate () {
 		return;
 	}
 	
-	// get the uniform locations and clear out the names (no longer needed)
+	// get the uniform locations
 	for ( u32 i = 0; i < this->mUniforms.Size (); ++i ) {
 		MOAIShaderUniform& uniform = this->mUniforms [ i ];
 		
 		if ( uniform.mType != MOAIShaderUniform::UNIFORM_NONE ) {
 			uniform.mAddr = zglGetUniformLocation ( this->mProgram, uniform.mName );
-			uniform.mName.clear ();
+			uniform.mIsDirty = true;
 		}
 	}
 

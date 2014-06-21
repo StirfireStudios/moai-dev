@@ -56,6 +56,7 @@ MOAIInputDevice::~MOAIInputDevice () {
 void MOAIInputDevice::RegisterLuaClass ( MOAILuaState& state ) {
 
 	luaL_Reg regTable [] = {
+		{ "getExtendedName",	_getExtendedName },
 		{ "new",					MOAILogMessages::_alertNewIsUnsupported },
 		{ NULL, NULL }
 	};
@@ -65,13 +66,7 @@ void MOAIInputDevice::RegisterLuaClass ( MOAILuaState& state ) {
 
 //----------------------------------------------------------------//
 void MOAIInputDevice::RegisterLuaFuncs ( MOAILuaState& state ) {
-	//UNUSED ( state );
-	luaL_Reg regTable [] = {
-		{ "getExtendedName",	_getExtendedName },
-		{ "getActive",			_getActive },
-		{ NULL, NULL }
-	};
-	luaL_register ( state, 0, regTable );
+	UNUSED ( state );
 }
 
 //----------------------------------------------------------------//

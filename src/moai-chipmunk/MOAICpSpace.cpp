@@ -19,7 +19,7 @@ public:
 
 	cpCollisionType		mTypeA;
 	cpCollisionType		mTypeB;
-	MOAILuaRef			mHandler;
+	MOAILuaStrongRef	mHandler;
 	u32					mMask;
 	
 	MOAICpSpace* mSpace;
@@ -277,14 +277,14 @@ int MOAICpSpace::_getStaticBody ( lua_State* L ) {
 }
 
 //----------------------------------------------------------------//
-/**	@name	insertProp
-	@text	Inserts a new prop into the world (can be used as a body, joint, etc.)
+/**	@name	insertPrim
+	@text	Inserts a new prim into the world (can be used as a body, joint, etc.)
 
 	@in		MOAICpSpace self
-	@in		MOAICpPrim prop
+	@in		MOAICpPrim prim
 	@out	nil
 */
-int MOAICpSpace::_insertProp ( lua_State* L ) {
+int MOAICpSpace::_insertPrim ( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAICpSpace, "UU" )
 	
 	MOAICpPrim* prim = state.GetLuaObject < MOAICpPrim >( 2, true );
@@ -299,6 +299,7 @@ int MOAICpSpace::_insertProp ( lua_State* L ) {
 	@text	Updates the shape in the spatial hash.
 
 	@in		MOAICpSpace self
+	@in		MOAICpShape shape
 	@out	nil
 */
 int MOAICpSpace::_rehashShape ( lua_State* L ) {
@@ -326,14 +327,14 @@ int MOAICpSpace::_rehashStatic ( lua_State* L ) {
 }
 
 //----------------------------------------------------------------//
-/**	@name	removeProp
-	@text	Removes a prop (body, joint, etc.) from the space.
+/**	@name	removePrim
+	@text	Removes a prim (body, joint, etc.) from the space.
 
 	@in		MOAICpSpace self
-	@in		MOAICpPrim prop
+	@in		MOAICpPrim prim
 	@out	nil
 */
-int MOAICpSpace::_removeProp ( lua_State* L ) {
+int MOAICpSpace::_removePrim ( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAICpSpace, "UU" )
 	
 	MOAICpPrim* prim = state.GetLuaObject < MOAICpPrim >( 2, true );
@@ -436,7 +437,7 @@ int MOAICpSpace::_setCollisionHandler ( lua_State* L ) {
 		}
 		
 		handler->mMask = state.GetValue < u32 >( 4, ALL );
-		handler->mHandler.SetStrongRef ( state, 5 );
+		handler->mHandler.SetRef ( state, 5 );
 	}
 	else {
 	
@@ -788,7 +789,7 @@ void MOAICpSpace::InsertPrim ( MOAICpPrim& prim ) {
 
 	if ( prim.mSpace == this ) return;
 	
-	prim.Retain ();
+	this->LuaRetain ( &prim );
 
 	if ( prim.mSpace ) {
 		prim.mSpace->RemovePrim ( prim );
@@ -832,7 +833,7 @@ MOAICpSpace::~MOAICpSpace () {
 	while ( primIt ) {
 		MOAICpPrim* prim = primIt->Data ();
 		primIt = primIt->Next ();
-		prim->Release ();
+		this->LuaRelease ( prim );
 	}
 
 	this->mPrims.Clear ();
@@ -915,10 +916,10 @@ void MOAICpSpace::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "getIterations",					_getIterations },
 		{ "getSleepTimeThreshold",			_getSleepTimeThreshold },
 		{ "getStaticBody",					_getStaticBody },
-		{ "insertPrim",						_insertProp },
+		{ "insertPrim",						_insertPrim },
 		{ "rehashShape",					_rehashShape },
 		{ "rehashStatic",					_rehashStatic },
-		{ "removePrim",						_removeProp },
+		{ "removePrim",						_removePrim },
 		{ "resizeActiveHash",				_resizeActiveHash },
 		{ "resizeStaticHash",				_resizeStaticHash },
 		{ "setCollisionHandler",			_setCollisionHandler },
@@ -947,5 +948,5 @@ void MOAICpSpace::RemovePrim ( MOAICpPrim& prim ) {
 	this->mPrims.Remove ( prim.mLinkInSpace );
 	
 	prim.mSpace = 0;
-	prim.Release ();
+	this->LuaRelease ( &prim );
 }

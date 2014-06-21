@@ -547,7 +547,7 @@ MOAIGfxDevice::MOAIGfxDevice () :
 	mCpuUVTransform ( false ),
 	mHasContext ( false ),
 	mIsFramebufferSupported ( 0 ),
-#if defined ( MOAI_OS_NACL ) || defined ( MOAI_OS_IPHONE ) || defined ( MOAI_OS_ANDROID )
+#if defined ( MOAI_OS_NACL ) || defined ( MOAI_OS_IPHONE ) || defined ( MOAI_OS_ANDROID ) || defined ( EMSCRIPTEN )
 	mIsOpenGLES ( true ),
 #else
 	mIsOpenGLES ( false ),
@@ -624,6 +624,7 @@ void MOAIGfxDevice::PushDeleter ( u32 type, u32 id ) {
 	deleter.mResourceID = id;
 	
 	this->mDeleterStack.Push ( deleter );
+	this->ProcessDeleters ();
 }
 
 //----------------------------------------------------------------//
@@ -748,7 +749,7 @@ void MOAIGfxDevice::ResetState () {
 	this->mDepthFunc = 0;
 	
 	// enable depth write
-	zglDepthMask ( this->mDepthMask );
+	zglDepthMask ( true );
 	this->mDepthMask = true;
 	
 	// clear the vertex format
@@ -1687,3 +1688,4 @@ void MOAIGfxDevice::WriteQuad ( const USVec2D* vtx, const USVec2D* uv, float xOf
 	
 	this->TransformAndWriteQuad ( vtxBuffer, uvBuffer );
 }
+

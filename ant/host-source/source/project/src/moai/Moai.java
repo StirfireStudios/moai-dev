@@ -6,25 +6,24 @@
 
 package com.ziplinegames.moai;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.TimeZone;
+import java.util.UUID;
+
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings.Secure;
 import android.util.DisplayMetrics;
-
-import java.lang.reflect.Method;
-import java.lang.Runtime;
-import java.util.Calendar;
-import java.util.TimeZone;
-import java.util.ArrayList;
-import java.util.UUID;
-import java.util.Locale;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -112,9 +111,11 @@ public class Moai {
 		"com.ziplinegames.moai.MoaiFacebook",
 		"com.ziplinegames.moai.MoaiKeyboard",
 		"com.ziplinegames.moai.MoaiGoogleBilling",
+		"com.ziplinegames.moai.MoaiGooglePlayServices",
 		"com.ziplinegames.moai.MoaiGooglePush",
 		"com.ziplinegames.moai.MoaiTapjoy",
 		"com.ziplinegames.moai.MoaiTwitter",
+		"com.ziplinegames.moai.MoaiCamera",
 	};
 
 	private static Activity 				sActivity = null;
@@ -123,9 +124,13 @@ public class Moai {
 
 	public static final Object		sAkuLock = new Object ();
 
+ 	protected static native void    AKUAppInitialize				();
+ 	protected static native void    AKUModulesRunLuaAPIWrapper      ();
 	protected static native boolean	AKUAppBackButtonPressed			();
+	protected static native void    AKUModulesContextInitialize     ();
 	protected static native void	AKUAppDialogDismissed			( int dialogResult );
 	protected static native void	AKUAppDidStartSession			( boolean resumed );
+	protected static native void	AKUAppOpenedFromURL			( String url );
 	protected static native void	AKUAppWillEndSession 			();
 	protected static native int		AKUCreateContext 				();
 	protected static native void	AKUDetectGfxContext 			();
@@ -138,7 +143,6 @@ public class Moai {
 	protected static native void	AKUExtLoadLuasocket				();
 	protected static native void	AKUExtLoadLuasql				();
 	protected static native void	AKUFinalize 					();
-	protected static native void	AKUFMODExInit		 			();
 	protected static native void	AKUInit 						();
 	protected static native void	AKUInitializeUtil 				();
 	protected static native void	AKUInitializeSim 				();
@@ -169,10 +173,10 @@ public class Moai {
 	public static native void 		AKUEnqueueJoystickEvent			( int deviceId, int sensorId, float x, float y);
 	protected static native void 	AKUSetScreenSize				( int width, int height );
 	protected static native void AKUSetScreenDpi         ( int dpi );
-  protected static native void 	AKUSetViewSize					( int width, int height );
-	protected static native void 	AKUSetWorkingDirectory 			( String path );
-	protected static native void 	AKUUntzInit			 			();
-	protected static native void 	AKUUpdate				 		();
+	protected static native void	AKUSetViewSize					( int width, int height );
+	protected static native void	AKUSetWorkingDirectory 			( String path );
+	protected static native void	AKUModulesUpdate				 		();
+    protected static native void 	AKUUntzInit			 			();
   protected static native void  AKUSetDeviceLocale        ( String langCode, String countryCode );
   public static native void  AKUEnableHusky();
   public static native void  AKUDisableHusky();
@@ -205,6 +209,8 @@ public class Moai {
 		synchronized ( sAkuLock ) {
 			contextId = AKUCreateContext ();
 			AKUSetContext ( contextId );
+			AKUModulesContextInitialize ();
+			AKUModulesRunLuaAPIWrapper ();
 		}
 		return contextId;
 	}
@@ -220,6 +226,12 @@ public class Moai {
 	public static void dialogDismissed ( int dialogResult ) {
 		synchronized ( sAkuLock ) {
 			AKUAppDialogDismissed ( dialogResult );
+		}
+	}
+
+	public static void AppOpenedFromURL ( String url ) {
+		synchronized ( sAkuLock ) {
+			AKUAppOpenedFromURL ( url );
 		}
 	}
 
@@ -303,10 +315,6 @@ public class Moai {
 	//----------------------------------------------------------------//
 	public static void init () {
 		synchronized ( sAkuLock ) {
-			AKUInitializeUtil ();
-			AKUInitializeSim ();
-			AKUInitializeHttpClient ();
-			AKUInitializeHusky ();
 
 			boolean ouya = Build.MANUFACTURER.contains("OUYA");
 			if (ouya)
@@ -353,14 +361,9 @@ public class Moai {
 			AKUExtLoadLuasocket ();
 
 			AKUInit ();
+			
 
-			// This AKU call will exist even if FMOD has been disabled in libmoai.so, so it's
-			// safe to call unconditionally.
-			AKUFMODExInit ();
-
-			// This AKU call will exist even if UNTZ has been disabled in libmoai.so, so it's
-			// safe to call unconditionally.
-			AKUUntzInit ();
+		
 
 			String appId = sActivity.getPackageName ();
 			String appName;
@@ -388,6 +391,7 @@ public class Moai {
 
 			AKUSetDeviceProperties ( appName, appId, appVersion, buildNumber, Build.CPU_ABI, Build.BRAND, Build.DEVICE, Build.MANUFACTURER, Build.MODEL, Build.PRODUCT, Runtime.getRuntime ().availableProcessors (), "Android", Build.VERSION.RELEASE, udid );
 			AKUSetDeviceLocale(Locale.getDefault().getLanguage(), Locale.getDefault().getCountry());
+
 		}
 	}
 
@@ -408,6 +412,7 @@ public class Moai {
 	//----------------------------------------------------------------//
 	public static void onCreate ( Activity activity ) {
 		sActivity = activity;
+		AKUAppInitialize();
 		MoaiMoviePlayer.onCreate ( activity );
 		MoaiBrowser.onCreate ( activity );
 		for ( Class < ? > theClass : sAvailableClasses ) {
@@ -452,6 +457,7 @@ public class Moai {
 
 	//----------------------------------------------------------------//
 	public static void pause ( boolean paused ) {
+		MoaiLog.d( "Moai.java::pause( " + paused + " )" );
 		synchronized ( sAkuLock ) {
 			AKUPause ( paused );
 		}
@@ -497,12 +503,12 @@ public class Moai {
 
 	//----------------------------------------------------------------//
 	public static void setCacheDirectory ( String path ) {
-
+		
 		synchronized ( sAkuLock ) {
 			AKUSetCacheDirectory ( path );
 		}
-	}
-
+	}	
+	
 	//----------------------------------------------------------------//
 	public static void setScreenSize ( int width, int height ) {
 		synchronized ( sAkuLock ) {
@@ -542,7 +548,7 @@ public class Moai {
 	public static void update () {
 		synchronized ( sAkuLock ) {
 			MoaiKeyboard.update ();
-			AKUUpdate ();
+			AKUModulesUpdate ();
 		}
 	}
 
@@ -653,7 +659,7 @@ public class Moai {
 		if ( text != null ) intent.putExtra ( Intent.EXTRA_TEXT, text );
 
 		sActivity.startActivity ( Intent.createChooser ( intent, prompt ));
-	}	
+	}
 
 	//----------------------------------------------------------------//
 	public static void showDialog ( String title, String message, String positiveButton, String neutralButton, String negativeButton, boolean cancelable ) {
