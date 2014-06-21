@@ -8,6 +8,7 @@ set ( CMAKE_CURRENT_SOURCE_DIR "${MOAI_ROOT}/src/moai-http-client/" )
 set ( MOAI_HTTP_CLIENT_INCLUDES 
   "${MOAI_ROOT}/src/"
   "${MOAI_ROOT}/src/config-default/"
+  "${MOAI_ROOT}/3rdparty/untz/src/threading/"
 )
 
 include_directories ( 

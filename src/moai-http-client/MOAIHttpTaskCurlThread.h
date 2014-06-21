@@ -11,8 +11,9 @@
 
 #include "pch.h"
 #include "MOAIHttpTaskCurl.h"
-#include <threading/Threading.h>
-
+#include <threading/RThread.h>
+#include <threading/RCriticalSection.h>
+ 
 extern "C" {
 	#include <curl/curl.h>
 }
