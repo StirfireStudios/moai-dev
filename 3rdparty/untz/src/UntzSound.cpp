@@ -83,6 +83,7 @@ Sound* Sound::create(const RString& path, bool loadIntoMemory)
 			return 0;
 		}
 	}
+#endif
 #ifdef MOAI_WITH_FLAC
 	else
 	if (path.find(FLAC_FILE_EXT) != RString::npos) {
@@ -113,6 +114,7 @@ Sound* Sound::create(const RString& path, bool loadIntoMemory)
 		}
 	}
 #endif
+#ifdef MOAI_WITH_OPUS
 	else
 		if (path.find(OPUS_FILE_EXT) != RString::npos) {
 			OpusAudioSource* source;
@@ -141,7 +143,8 @@ Sound* Sound::create(const RString& path, bool loadIntoMemory)
 				return 0;
 			}
 		}
-	else
+#endif
+    else
 	{
 #if defined(WIN32)
 		DShowAudioSource* source;
