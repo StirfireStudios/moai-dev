@@ -84,7 +84,7 @@ Sound* Sound::create(const RString& path, bool loadIntoMemory)
 		}
 	}
 #endif
-#ifdef MOAI_WITH_FLAC
+#if MOAI_WITH_FLAC
 	else
 	if (path.find(FLAC_FILE_EXT) != RString::npos) {
 		FLACAudioSource* source;
@@ -114,7 +114,7 @@ Sound* Sound::create(const RString& path, bool loadIntoMemory)
 		}
 	}
 #endif
-#ifdef MOAI_WITH_OPUS
+#if MOAI_WITH_OPUS
 	else
 		if (path.find(OPUS_FILE_EXT) != RString::npos) {
 			OpusAudioSource* source;

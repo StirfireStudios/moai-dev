@@ -42,13 +42,13 @@ if (MOAI_VORBIS)
   target_link_libraries ( untz vorbis )
 endif (MOAI_VORBIS)
 
-if (MOAI_FLAC})
-  target_link_libraries ( untz flac )
-endif (MOAI_FLAC)
-
 if (MOAI_OPUS})
   target_link_libraries ( untz opus )
 endif (MOAI_OPUS)
+
+if (MOAI_FLAC})
+  target_link_libraries ( untz flac )
+endif (MOAI_FLAC)
 
 target_include_directories ( untz PUBLIC ${UNTZ_INCLUDES} )
 
