@@ -12,7 +12,6 @@
 #define __libmoai__MOAIHusky__
 
 #include <Husky.h>
-#include <jni.h>
 
 class MOAIHusky : public MOAIGlobalClass <MOAIHusky, MOAILuaObject>, public HuskyObserver {
 private:

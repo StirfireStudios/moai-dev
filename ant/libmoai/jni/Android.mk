@@ -67,9 +67,6 @@
 	ifeq ($(HUSKY_TYPE), gamecircle)
 		LOCAL_SHARED_LIBRARIES := AmazonGamesJni
 		LOCAL_CFLAGS	+= -DMOAI_WITH_GAME_CIRCLE_HUSKY=1
-	else ifeq ($(HUSKY_TYPE), gamecircle)
-		LOCAL_SHARED_LIBRARIES := AmazonGamesJni
-		LOCAL_CFLAGS	+= -DMOAI_WITH_GOOGLE_PLAY_HUSKY=1
 	endif
 
 #----------------------------------------------------------------#

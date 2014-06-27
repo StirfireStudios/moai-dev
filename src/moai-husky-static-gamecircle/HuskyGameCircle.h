@@ -14,7 +14,7 @@
 #include <AchievementsClientInterface.h>
 #include <WhispersyncClientInterface.h>
 #include <LeaderboardsClientInterface.h>
-#include <ProfilesClientInterface.h>
+#include <PlayerclientInterface.h>
 #include <GameCircleClientInterface.h>
 
 #include <Husky.h>
@@ -53,7 +53,7 @@ class HuskyGameCircle : Husky,
 	public AmazonGames::ILeaderboardSubmitScoreCb,
 	public AmazonGames::ILeaderboardGetPlayerScoreCb,
 	public AmazonGames::ILeaderboardGetScoresCb,
-	public AmazonGames::IProfileGetLocalPlayerProfileCb {
+	public AmazonGames::IGetLocalPlayerCb {
 public:
 	HuskyGameCircle();
 	~HuskyGameCircle();
@@ -99,7 +99,7 @@ public:
 
 	void onGetScoresCb(AmazonGames::ErrorCode errorCode, const AmazonGames::LeaderboardScores* responseStruct, int developerTag);
 
-	void onGetLocalPlayerProfileCb(AmazonGames::ErrorCode errorCode, const AmazonGames::PlayerInfo* responseStruct, int developerTag);
+	void onGetLocalPlayerCb(AmazonGames::ErrorCode errorCode, const AmazonGames::PlayerInfo* responseStruct, int developerTag);
 
 	static bool enabled;
 

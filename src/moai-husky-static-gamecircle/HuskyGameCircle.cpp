@@ -106,7 +106,7 @@ void HuskyGameCircle::doTick() {
 			_leaderboardPlayerScoreCallbackList->erase(i1);
 		} else {
 			if (HuskyGameCircle::enabled)
-				AmazonGames::ProfilesClientInterface::getLocalPlayerProfile(this, 0);
+				AmazonGames::PlayerClientInterface::getLocalPlayer(this, 0);
 		}
 	}
 
@@ -285,7 +285,7 @@ void HuskyGameCircle::onGetScoresCb(AmazonGames::ErrorCode errorCode, const Amaz
 	_leaderboardScoresCallbackList->push_back(callback);
 }
 
-void HuskyGameCircle::onGetLocalPlayerProfileCb(AmazonGames::ErrorCode errorCode, const AmazonGames::PlayerInfo* responseStruct, int developerTag) {
+void HuskyGameCircle::onGetLocalPlayerCb(AmazonGames::ErrorCode errorCode, const AmazonGames::PlayerInfo* responseStruct, int developerTag) {
 	if (errorCode == 0) {
 		int length;
 		if (_playerId != NULL)
