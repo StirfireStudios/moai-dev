@@ -81,22 +81,7 @@ public class MoaiActivity extends Activity implements ControllerListener {
 	private Controller						mController = null;
 	private Handler 						mButtonHandler = null;
 	private Runnable 						mMenuButtonDown = null;
-	// Amazon Game Circle Client - BEGIN
-	private com.amazon.ags.api.AmazonGamesClient amazongamecircleClient;
-
-	com.amazon.ags.api.AmazonGamesCallback amazonGameCircleCallback = new com.amazon.ags.api.AmazonGamesCallback() {
-		@Override
-		public void onServiceNotReady(com.amazon.ags.api.AmazonGamesStatus status) {
-		    Moai.AKUDisableHusky();
-		}
-		@Override
-		public void onServiceReady(com.amazon.ags.api.AmazonGamesClient amazonGamesClient) {
-		    amazongamecircleClient = amazonGamesClient;
-		    Moai.AKUEnableHusky();
-		}
-	};
-	// Amazon Game Circle Client - END
-
+	// Amazon Game Circle - INSERT HERE - 1
 
 	// OUYA
 	private boolean mOuya = false;
@@ -104,10 +89,7 @@ public class MoaiActivity extends Activity implements ControllerListener {
 
 	//----------------------------------------------------------------//
 	static {
-		MoaiLog.i ( "Loading libAmazonGamesJni.so.so" );
-
-		System.loadLibrary ( "AmazonGamesJni" );
-
+		// Amazon Game Circle - INSERT HERE - 3
 		MoaiLog.i ( "Loading libmoai.so" );
 
 		System.loadLibrary ( "moai" );
@@ -236,11 +218,7 @@ public class MoaiActivity extends Activity implements ControllerListener {
 
 		super.onPause ();
 
-		// AMAZON GAME CIRCLE
-		if (amazongamecircleClient != null) {
-			amazongamecircleClient.release();
-			Moai.AKUDisableHusky();
-    }
+		// Amazon Game Circle - INSERT HERE - 4
 
 		Moai.onPause ();
 
@@ -279,8 +257,7 @@ public class MoaiActivity extends Activity implements ControllerListener {
 
 		super.onResume ();
 
-		// AMAZON GAME CIRCLE
-		com.amazon.ags.api.AmazonGamesClient.initialize(this, amazonGameCircleCallback, com.amazon.ags.api.AmazonGamesFeature.all());
+		// Amazon Game Circle - INSERT HERE - 2
 
 		Moai.onResume ();
 
