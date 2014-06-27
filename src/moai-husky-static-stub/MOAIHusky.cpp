@@ -67,6 +67,70 @@ int MOAIHusky::_hasCloudSaves( lua_State* L ) {
 	return 0;
 }
 
+int MOAIHusky::_hasGenericOverlay( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+
+	ZLLog::Print ( "Static Husky Stub provides no functions - hasGenericOverlay" );
+
+	return 0;
+}
+
+int MOAIHusky::_hasAchievementsOverlay( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+
+	ZLLog::Print ( "Static Husky Stub provides no functions - hasAchievementsOverlay" );
+
+	return 0;
+}
+
+int MOAIHusky::_hasAchievementsReset( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+
+	ZLLog::Print ( "Static Husky Stub provides no functions - hasAchievementsReset" );
+
+	return 0;
+}
+
+int MOAIHusky::_hasLeaderboardRangeFetch( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+
+	ZLLog::Print ( "Static Husky Stub provides no functions - hasLeaderboardRangeFetch" );
+
+	return 0;
+}
+
+int MOAIHusky::_hasLeaderboardsOverlay( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+
+	ZLLog::Print ( "Static Husky Stub provides no functions - hasLeaderboardsOverlay" );
+
+	return 0;
+}
+
+int MOAIHusky::_hasSingleLeaderboardOverlay( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+
+	ZLLog::Print ( "Static Husky Stub provides no functions - hasSingleLeaderboardOverlay" );
+
+	return 0;
+}
+
+int MOAIHusky::_showGenericOverlay( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+
+	ZLLog::Print ( "Static Husky Stub provides no functions - showGenericOverlay" );
+
+	return 0;
+}
+
+int MOAIHusky::_showAchievementsOverlay( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+
+	ZLLog::Print ( "Static Husky Stub provides no functions - showAchievementsOverlay" );
+
+	return 0;
+}
+
 int MOAIHusky::_achievementReset( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "U" )
 
@@ -96,30 +160,32 @@ int MOAIHusky::_achievementSetCallback( lua_State* L ) {
 	return 0;
 }
 
+int MOAIHusky::_leaderboardMetadataBytes( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+
+	ZLLog::Print ( "Static Husky Stub provides no functions - leaderboardMetadataBytes" );
+	
+	return 0;
+}
+
+int MOAIHusky::_showLeaderboardsOverlay( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+
+	ZLLog::Print ( "Static Husky Stub provides no functions - showLeaderboardsOverlay" );
+	
+	return 0;
+}
+
+int MOAIHusky::_showSingleLeaderboardOverlay( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIHusky, "U" )
+
+	ZLLog::Print ( "Static Husky Stub provides no functions - showSingleLeaderboardOverlay" );
+	
+	return 0;
+}
+
 int MOAIHusky::_leaderboardUploadScore( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "USNS" )
-	
-	cc8* name = lua_tostring ( state, 2 );
-	int32_t score = lua_tointeger( state, 3 );
-	cc8* replacement = lua_tostring ( state, 4 );
-	MOAIStream* moaistream = state.GetLuaObject < MOAIStream >( 5, true );
-	int64_t data = 0;
-	if (moaistream != NULL) {
-		ZLStream *stream = moaistream->GetZLStream();
-		stream->Seek(0, SEEK_SET);
-		if (stream->GetLength() < 8) {
-			stream->ReadBytes((void*)&data, stream->GetLength());
-		} else {
-			stream->ReadBytes((void*)&data, 8);
-		}
-	}
-	
-	HuskyLeaderboardScoreToKeep update = HuskyLeaderboardScoreToKeepNone;
-	if (strcasecmp(replacement, "best") == 0) {
-		update = HuskyLeaderboardScoreToKeepBest;
-	} else if (strcasecmp(replacement, "update") == 0) {
-		update = HuskyLeaderboardScoreToKeepUpdate;
-	}
 
 	ZLLog::Print ( "Static Husky Stub provides no functions - leaderboardUploadScore" );	
 
@@ -129,8 +195,6 @@ int MOAIHusky::_leaderboardUploadScore( lua_State* L ) {
 int MOAIHusky::_leaderboardSetScoreCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
 	
-	self->SetLocal(state, 2, self->_leaderboardScoreSetCallback);
-
 	ZLLog::Print ( "Static Husky Stub provides no functions - leaderboardSetScoreCallback" );	
 	
 	return 0;
@@ -138,19 +202,6 @@ int MOAIHusky::_leaderboardSetScoreCallback( lua_State* L ) {
 
 int MOAIHusky::_leaderboardGetScores( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "USBBSNN" )
-		
-	cc8* name = state.GetValue<cc8*>(2, 0);
-	bool friends = state.GetValue<bool>(3,0);
-	bool around = state.GetValue<bool>(4,0);
-	cc8* timeframestring = state.GetValue<cc8*>(5,0);
-	int32_t offset = state.GetValue<int>(6, 0);
-	int32_t number = state.GetValue<int>(7, 0);
-	
-	HuskyLeaderboardScoreTimeFrame timeframe = HuskyLeaderboardAllScores;
-	if (strcasecmp(timeframestring, "week"))
-		timeframe = HuskyLeaderboardWeeksScores;
-	else if (strcasecmp(timeframestring, "day"))
-		timeframe = HuskyLeaderboardTodaysScores;
 
 	ZLLog::Print ( "Static Husky Stub provides no functions - leaderboardGetScores" );	
 			
@@ -160,8 +211,6 @@ int MOAIHusky::_leaderboardGetScores( lua_State* L ) {
 int MOAIHusky::_leaderboardSetGetScoresCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
 	
-	self->SetLocal(state, 2, self->_leaderboardScoreGetCallback);
-
 	ZLLog::Print ( "Static Husky Stub provides no functions - leaderboardSetGetScoresCallback" );	
 	
 	return 0;
@@ -169,10 +218,6 @@ int MOAIHusky::_leaderboardSetGetScoresCallback( lua_State* L ) {
 
 int MOAIHusky::_cloudDataUpload( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "US" )
-	
-	cc8* cloudpath = state.GetValue<cc8*>(2, 0);
-	MOAIDataBuffer* data = state.GetLuaObject < MOAIDataBuffer >( 3, true );
-	ZLLeanArray<u8> *array = data->getBuffer();
 	
 	ZLLog::Print ( "Static Husky Stub provides no functions - cloudDataUpload" );	
 
@@ -182,8 +227,6 @@ int MOAIHusky::_cloudDataUpload( lua_State* L ) {
 int MOAIHusky::_cloudDataSetUploadCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
 	
-	self->SetLocal(state, 2, self->_cloudDataUploadCallback);
-
 	ZLLog::Print ( "Static Husky Stub provides no functions - cloudDataUploadCallback" );		
 	
 	return 0;
@@ -192,8 +235,6 @@ int MOAIHusky::_cloudDataSetUploadCallback( lua_State* L ) {
 int MOAIHusky::_cloudDataDownload( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "US" )
 	
-	cc8* cloudpath = state.GetValue<cc8*>(2, 0);
-	
 	ZLLog::Print ( "Static Husky Stub provides no functions - cloudDataDownload" );		
 
 	return 0;
@@ -201,8 +242,6 @@ int MOAIHusky::_cloudDataDownload( lua_State* L ) {
 
 int MOAIHusky::_cloudDataSetDownloadCallback( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIHusky, "UF" )
-
-	self->SetLocal(state, 2, self->_cloudDataDownloadCallback);
 
 	ZLLog::Print ( "Static Husky Stub provides no functions - cloudDataDownloadCallback" );		
 	
@@ -223,26 +262,36 @@ void MOAIHusky::RegisterLuaClass ( MOAILuaState& state ) {
 	
 	// also register constants:
 	// state.SetField ( -1, "FOO_CONST", ( u32 )FOO_CONST );
-	
 	// here are the class methods:
 	luaL_Reg regTable [] = {
 		{ "getAvailable",						_getAvailable },
 		{ "getCurrent",							_getCurrent },
 		{ "setCurrent",							_setCurrent },
-		{ "hasLeaderboards",						_hasLeaderboards },
-		{ "hasAchievements",						_hasAchievements },
-		{ "hasCloudSaves",						_hasCloudSaves },
-		{ "achievementReset",					_achievementReset },
+		{ "hasGenericOverlay",					_hasGenericOverlay },
+		{ "showGenericOverlay",					_showGenericOverlay },
 		{ "achievementSet",						_achievementSet },
 		{ "achievementSetCallback",				_achievementSetCallback },
-		{ "leaderboardUploadScore",				_leaderboardUploadScore },
-		{ "leaderboardSetUploadScoreCallback",	_leaderboardSetScoreCallback },
-		{ "leaderboardGetScores",				_leaderboardGetScores },
-		{ "leaderboardSetGetScoresCallback",		_leaderboardSetGetScoresCallback },
+		{ "showAchievementsOverlay",				_showAchievementsOverlay },
+		{ "hasAchievementsOverlay",				_hasAchievementsOverlay },
+		{ "hasAchievements",						_hasAchievements },
+		{ "achievementReset",					_achievementReset },
+		{ "hasAchievementsReset",				_hasAchievementsReset },
 		{ "cloudDataUpload",						_cloudDataUpload },
 		{ "cloudDataSetUploadCallback",			_cloudDataSetUploadCallback },
 		{ "cloudDataDownload",					_cloudDataDownload },
 		{ "cloudDataSetDownloadCallback",		_cloudDataSetDownloadCallback },
+		{ "hasCloudSaves",						_hasCloudSaves },
+		{ "hasLeaderboards",						_hasLeaderboards },
+		{ "leaderboardMetadataBytes",			_leaderboardMetadataBytes },
+		{ "leaderboardUploadScore",				_leaderboardUploadScore },
+		{ "leaderboardSetUploadScoreCallback",	_leaderboardSetScoreCallback },
+		{ "leaderboardGetScores",				_leaderboardGetScores },
+		{ "leaderboardSetGetScoresCallback",		_leaderboardSetGetScoresCallback },
+		{ "hasLeaderboardRangeFetch",			_hasLeaderboardRangeFetch },
+		{ "hasLeaderboardsOverlay",				_hasLeaderboardsOverlay },
+		{ "showLeaderboardsOverlay",				_showLeaderboardsOverlay },
+		{ "hasSingleLeaderboardOverlay",			_hasSingleLeaderboardOverlay },
+		{ "showSingleLeaderboardOverlay",		_showSingleLeaderboardOverlay },
 		{ "doTick", _doTick },
 		{ NULL, NULL }
 	};
@@ -334,13 +383,4 @@ void MOAIHusky::HuskyObserverCloudDataUploaded(const char *path, bool success) {
 	state.Push(path);
 	state.Push(success);
 	state.DebugCall(2, 0);
-}
-
-//----------------------------------------------------------------//
-extern "C" void Java_com_ziplinegames_moai_Moai_AKUEnableHusky ( JNIEnv* env, jclass obj ) {
-	MOAIHusky::enabled = true;
-}
-
-extern "C" void Java_com_ziplinegames_moai_Moai_AKUDisableHusky ( JNIEnv* env, jclass obj ) {
-	MOAIHusky::enabled = false;
 }

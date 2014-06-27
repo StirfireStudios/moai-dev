@@ -256,6 +256,8 @@
 			$AMAZON_GAME_CIRCLE_SDK_ROOT/.* $AMAZON_GAME_CIRCLE_SDK_ROOT/*.xml \
 			$AMAZON_GAME_CIRCLE_SDK_ROOT/*.properties \
 			$new_host_dir/host-source/external/amazon-game-circle/project/
+	else
+		rm -rf $new_host_dir/host-source/external/amazon-game-circle
 	fi
 
 	echo "********************************************************************************"
