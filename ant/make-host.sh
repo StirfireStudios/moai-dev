@@ -100,6 +100,13 @@
 		exit 1
 	fi
 
+	if [ x"$husky_type" == xgamecircle ] && [ x"$AMAZON_GAME_CIRCLE_SDK_ROOT" == x ]; then
+		echo "*** The Amazon Game Circle SDK is not redistributed with the Moai SDK. Please download it"
+		echo "*** and ensure AMAZON_GAME_CIRCLE_SDK_ROOT environment variable is set and points to the root of the"
+		echo "*** Gamecircle SDK"
+		exit 1
+	fi
+
 	if [ x"$use_fmod" == xtrue ] && [ x"$FMOD_ANDROID_SDK_ROOT" == x ]; then
 		echo "*** The FMOD SDK is not redistributed with the Moai SDK. Please download the FMOD EX"
 		echo "*** Programmers API SDK from http://fmod.org and install it. Then ensure that the"
@@ -243,6 +250,13 @@
 
 	sed -i.backup s%@SETTING_PACKAGE@%"$package_name"%g $new_host_dir/run-host.bat
 	rm -f $new_host_dir/run-host.bat.backup
+
+	if [ x"$husky_type" == xgamecircle ]; then
+		cp -fr $AMAZON_GAME_CIRCLE_SDK_ROOT/res $AMAZON_GAME_CIRCLE_SDK_ROOT/libs \
+			$AMAZON_GAME_CIRCLE_SDK_ROOT/.* $AMAZON_GAME_CIRCLE_SDK_ROOT/*.xml \
+			$AMAZON_GAME_CIRCLE_SDK_ROOT/*.properties \
+			$new_host_dir/host-source/external/amazon-game-circle/project/
+	fi
 
 	echo "********************************************************************************"
 	echo "* Android host successfully created.                                           *"
