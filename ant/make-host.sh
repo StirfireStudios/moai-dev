@@ -256,6 +256,11 @@
 			$AMAZON_GAME_CIRCLE_SDK_ROOT/.* $AMAZON_GAME_CIRCLE_SDK_ROOT/*.xml \
 			$AMAZON_GAME_CIRCLE_SDK_ROOT/*.properties \
 			$new_host_dir/host-source/external/amazon-game-circle/project/
+
+			activity=$new_host_dir/host-source/project/$package_path/MoaiActivity.java
+			gcsource=host-source/source/project/external/amazon-game-circle
+			sed -f $gcsource/insert.sed $activity > temp.java
+			mv temp.java $activity
 	else
 		rm -rf $new_host_dir/host-source/external/amazon-game-circle
 	fi
