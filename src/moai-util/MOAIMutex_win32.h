@@ -7,7 +7,7 @@
 #ifdef _WIN32
 
 #include <moai-util/MOAIMutex.h>
-#include <windows.h>
+#include <Windows.h>
 
 //================================================================//
 // MOAIMutexImpl
