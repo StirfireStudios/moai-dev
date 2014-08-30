@@ -13,6 +13,7 @@
 #include "MOAIHttpTaskCurl.h"
 #include <threading/RThread.h>
 #include <threading/RCriticalSection.h>
+#include <threading/RScopedLock.h>
  
 extern "C" {
 	#include <curl/curl.h>

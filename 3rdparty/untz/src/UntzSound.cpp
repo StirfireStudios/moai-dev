@@ -51,10 +51,15 @@ Sound* Sound::create(const RString& path, bool loadIntoMemory)
 {
 	Sound* prevSound = UNTZ::System::get()->getData()->getInMemorySound(path);
 	Sound* newSound = new Sound();
+
+  bool hasExt_ogg = path.find(OGG_FILE_EXT) != RString::npos;
+  bool hasExt_flac = path.find(FLAC_FILE_EXT) != RString::npos;
+  bool hasExt_opus = path.find(OPUS_FILE_EXT) != RString::npos;
+  bool hasNoSupportedExt = !hasExt_ogg && !hasExt_flac && !hasExt_opus;
 	
-	if (path.find(OGG_FILE_EXT) != RString::npos)
-	{
 #if MOAI_WITH_VORBIS
+	if (hasExt_ogg)
+	{
 		OggAudioSource* source;
 		if(prevSound && loadIntoMemory && prevSound->getData()->getSource()->isLoadedInMemory())
 			// Use the existing AudioSource
@@ -85,8 +90,8 @@ Sound* Sound::create(const RString& path, bool loadIntoMemory)
 	}
 #endif
 #if MOAI_WITH_FLAC
-	else
-	if (path.find(FLAC_FILE_EXT) != RString::npos) {
+	if (hasExt_flac)
+  {
 		FLACAudioSource* source;
 		if(prevSound && loadIntoMemory && prevSound->getData()->getSource()->isLoadedInMemory())
 			source = (FLACAudioSource*)prevSound->getData()->getSource().get();
@@ -115,8 +120,8 @@ Sound* Sound::create(const RString& path, bool loadIntoMemory)
 	}
 #endif
 #if MOAI_WITH_OPUS
-	else
-		if (path.find(OPUS_FILE_EXT) != RString::npos) {
+	if (hasExt_opus)
+  {
 			OpusAudioSource* source;
 			if(prevSound && loadIntoMemory && prevSound->getData()->getSource()->isLoadedInMemory())
 				source = (OpusAudioSource*)prevSound->getData()->getSource().get();
@@ -142,10 +147,9 @@ Sound* Sound::create(const RString& path, bool loadIntoMemory)
 				delete newSound;
 				return 0;
 			}
-		}
+	}
 #endif
-    else
-	{
+  if (hasNoSupportedExt) {
 #if defined(WIN32)
 		DShowAudioSource* source;
 		if(prevSound && loadIntoMemory && prevSound->getData()->getSource()->isLoadedInMemory())
