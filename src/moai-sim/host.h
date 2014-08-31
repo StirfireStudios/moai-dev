@@ -26,6 +26,7 @@ typedef void ( *AKUSetSimStepFunc )				( double step );
 AKU_API void			AKUSimAppFinalize				();
 AKU_API void			AKUSimAppInitialize				();
 AKU_API void			AKUSimContextInitialize			();
+static bool       sIsInitialized = false;
 
 // management api
 AKU_API void			AKUDetectGfxContext				();
