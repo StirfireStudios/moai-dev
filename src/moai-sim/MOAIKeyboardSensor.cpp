@@ -274,3 +274,7 @@ void MOAIKeyboardSensor::WriteEvent ( ZLStream& eventStream, u32 key, bool down 
 	eventStream.Write < u32 >( key );
 	eventStream.Write < bool >( down );
 }
+
+int	MOAIKeyboardSensor::EventSize() {
+	return sizeof(u32) + sizeof(bool);
+}

@@ -507,3 +507,7 @@ void MOAITouchSensor::WriteEventCancel ( ZLStream& eventStream ) {
 
 	eventStream.Write < u32 >( TOUCH_CANCEL );
 }
+
+int	MOAITouchSensor::EventSize() {
+	return sizeof(u32);
+}

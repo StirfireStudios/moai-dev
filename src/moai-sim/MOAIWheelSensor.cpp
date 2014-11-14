@@ -115,3 +115,7 @@ void MOAIWheelSensor::WriteEvent ( ZLStream& eventStream, float value ) {
 
 	eventStream.Write < float >( value );
 }
+
+int	MOAIWheelSensor::EventSize() {
+	return sizeof(float);
+}

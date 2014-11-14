@@ -101,3 +101,7 @@ void MOAIMotionSensor::WriteEvent ( ZLStream& eventStream, float x, float y, flo
 	eventStream.Write < float >( y );
 	eventStream.Write < float >( z );
 }
+
+int	MOAIMotionSensor::EventSize() {
+	return sizeof(float) * 3;
+}

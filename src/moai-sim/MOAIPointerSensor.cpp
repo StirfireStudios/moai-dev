@@ -96,3 +96,7 @@ void MOAIPointerSensor::WriteEvent ( ZLStream& eventStream, int x, int y ) {
 	eventStream.Write < int >( x );
 	eventStream.Write < int >( y );
 }
+
+int	MOAIPointerSensor::EventSize() {
+	return sizeof(int) * 2;
+}

@@ -89,3 +89,7 @@ void MOAICompassSensor::WriteEvent ( ZLStream& eventStream, float heading ) {
 
 	eventStream.Write < float >( heading );
 }
+
+int	MOAICompassSensor::EventSize() {
+	return sizeof(float);
+}

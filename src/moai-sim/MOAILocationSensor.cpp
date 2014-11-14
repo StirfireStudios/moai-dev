@@ -119,3 +119,7 @@ void MOAILocationSensor::WriteEvent ( ZLStream& eventStream, double longitude, d
 	eventStream.Write < float >( vAccuracy );
 	eventStream.Write < float >( speed );
 }
+
+int	MOAILocationSensor::EventSize() {
+	return sizeof(double) * 3 + sizeof(float) * 3;
+}

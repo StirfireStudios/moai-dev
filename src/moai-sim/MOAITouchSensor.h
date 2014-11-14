@@ -118,6 +118,7 @@ public:
 
 	//----------------------------------------------------------------//
 	void			HandleEvent				( ZLStream& eventStream );
+	int				EventSize					();	
 					MOAITouchSensor			();
 					~MOAITouchSensor		();
 	void			RegisterLuaClass		( MOAILuaState& state );

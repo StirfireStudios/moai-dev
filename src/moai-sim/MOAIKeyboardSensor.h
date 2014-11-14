@@ -54,6 +54,7 @@ public:
 
 	//----------------------------------------------------------------//
 	void			HandleEvent				( ZLStream& eventStream );
+	int				EventSize					();
 	bool			KeyDown					( u32 keyID );
 	bool			KeyIsDown				( u32 keyID );
 	bool			KeyIsUp					( u32 keyID );

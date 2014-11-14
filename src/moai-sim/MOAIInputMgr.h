@@ -18,7 +18,7 @@ class MOAIInputMgr :
 private:
 
 	ZLMemStream	mInput;
-
+	MOAIMutex		mMutex;
 	ZLLeanArray < MOAIInputDevice* > mDevices;
 
 	//----------------------------------------------------------------//

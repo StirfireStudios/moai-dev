@@ -181,3 +181,7 @@ void MOAIButtonSensor::WriteEvent ( ZLStream& eventStream, bool down ) {
 
 	eventStream.Write < bool >( down );
 }
+
+int	MOAIButtonSensor::EventSize() {
+	return sizeof(bool);
+}

@@ -36,6 +36,7 @@ public:
 
 	//----------------------------------------------------------------//
 	virtual void	HandleEvent			( ZLStream& eventStream ) = 0;
+	virtual int	  EventSize		 		() = 0;
 					MOAISensor			();
 					~MOAISensor			();
 	void			RegisterLuaClass	( MOAILuaState& state );

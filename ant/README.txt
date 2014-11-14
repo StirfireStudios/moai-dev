@@ -13,6 +13,9 @@
     host once it has been configured. This will create a directory called "build"
     which contains a full Android project that can be imported into Eclipse and
     then launches the application onto the default Android emulator or device.
+  - The Path specified in $AMAZON_GAME_CIRCLE_SDK_ROOT must not contain spaces 
+    as the Android build system does not handle spaces in pathnames properly.
+
 
 -------------------------------------------------------------------------------
 -- WINDOWS

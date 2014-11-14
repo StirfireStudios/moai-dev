@@ -102,3 +102,7 @@ void MOAIJoystickSensor::WriteEvent ( ZLStream& eventStream, float x, float y ) 
 	eventStream.Write < float >( x );
 	eventStream.Write < float >( y );
 }
+
+int	MOAIJoystickSensor::EventSize() {
+	return sizeof(float) + sizeof(float);
+}

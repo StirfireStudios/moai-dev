@@ -31,6 +31,7 @@ public:
 
 	//----------------------------------------------------------------//
 	void			HandleEvent				( ZLStream& eventStream );
+	int				EventSize					();
 					MOAIPointerSensor		();
 					~MOAIPointerSensor		();
 	void			RegisterLuaClass		( MOAILuaState& state );

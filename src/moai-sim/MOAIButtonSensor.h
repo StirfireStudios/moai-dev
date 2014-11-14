@@ -41,14 +41,15 @@ public:
 	bool			ButtonDown				();
 	bool			ButtonIsDown			();
 	bool			ButtonIsUp				();
-	bool			ButtonUp				();
+	bool			ButtonUp					();
 	void			HandleEvent				( ZLStream& eventStream );
+	int				EventSize					();
 					MOAIButtonSensor		();
 					~MOAIButtonSensor		();
-	void			RegisterLuaClass		( MOAILuaState& state );
-	void			RegisterLuaFuncs		( MOAILuaState& state );
-	void			Reset					();
-	static void		WriteEvent				( ZLStream& eventStream, bool down );
+	void			RegisterLuaClass	( MOAILuaState& state );
+	void			RegisterLuaFuncs	( MOAILuaState& state );
+	void			Reset							();
+	static void		WriteEvent		( ZLStream& eventStream, bool down );
 };
 
 #endif

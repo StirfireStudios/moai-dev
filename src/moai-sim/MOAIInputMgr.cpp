@@ -1,6 +1,8 @@
 // Copyright (c) 2010-2011 Zipline Games, Inc. All Rights Reserved.
 // http://getmoai.com
 
+#include <android/log.h>
+
 #include "pch.h"
 
 #include <moai-sim/MOAIButtonSensor.h>
@@ -35,93 +37,103 @@ bool MOAIInputMgr::CheckSensor ( u8 deviceID, u8 sensorID, u32 type ) {
 
 //----------------------------------------------------------------//
 void MOAIInputMgr::EnqueueButtonEvent ( u8 deviceID, u8 sensorID, bool down ) {
-
+	this->mMutex.Lock();
 	if ( this->CheckSensor ( deviceID, sensorID, MOAISensor::BUTTON )) {
 		this->WriteEventHeader ( deviceID, sensorID, MOAISensor::BUTTON );
 		MOAIButtonSensor::WriteEvent ( this->mInput, down );
 	}
+	this->mMutex.Unlock();	
 }
 
 //----------------------------------------------------------------//
 void MOAIInputMgr::EnqueueCompassEvent ( u8 deviceID, u8 sensorID, float heading ) {
-
+	this->mMutex.Lock();
 	if ( this->CheckSensor ( deviceID, sensorID, MOAISensor::COMPASS )) {
 		this->WriteEventHeader ( deviceID, sensorID, MOAISensor::COMPASS );
 		MOAICompassSensor::WriteEvent ( this->mInput, heading );
 	}
+	this->mMutex.Unlock();
 }
 
 //----------------------------------------------------------------//
 void MOAIInputMgr::EnqueueJoystickEvent( u8 deviceID, u8 sensorID, float x, float y ) {
-	
+	this->mMutex.Lock();
 	if ( this->CheckSensor ( deviceID, sensorID, MOAISensor::JOYSTICK )) {
 		this->WriteEventHeader ( deviceID, sensorID, MOAISensor::JOYSTICK );
 		MOAIJoystickSensor::WriteEvent ( this->mInput, x, y );
 	}
+	this->mMutex.Unlock();
 }
 
 //----------------------------------------------------------------//
 void MOAIInputMgr::EnqueueKeyboardEvent ( u8 deviceID, u8 sensorID, u32 keyID, bool down ) {
-
+	this->mMutex.Lock();
 	if ( this->CheckSensor ( deviceID, sensorID, MOAISensor::KEYBOARD )) {
 		this->WriteEventHeader ( deviceID, sensorID, MOAISensor::KEYBOARD );
 		MOAIKeyboardSensor::WriteEvent ( this->mInput, keyID, down );
 	}
+	this->mMutex.Unlock();
 }
 
 //----------------------------------------------------------------//
 void MOAIInputMgr::EnqueueLevelEvent ( u8 deviceID, u8 sensorID, float x, float y, float z ) {
-
+	this->mMutex.Lock();
 	if ( this->CheckSensor ( deviceID, sensorID, MOAISensor::LEVEL )) {
 		this->WriteEventHeader ( deviceID, sensorID, MOAISensor::LEVEL );
 		MOAIMotionSensor::WriteEvent ( this->mInput, x, y, z );
 	}
+	this->mMutex.Unlock();
 }
 
 //----------------------------------------------------------------//
 void MOAIInputMgr::EnqueueLocationEvent ( u8 deviceID, u8 sensorID, double longitude, double latitude, double altitude, float hAccuracy, float vAccuracy, float speed ) {
-
+	this->mMutex.Lock();
 	if ( this->CheckSensor ( deviceID, sensorID, MOAISensor::LOCATION )) {
 		this->WriteEventHeader ( deviceID, sensorID, MOAISensor::LOCATION );
 		MOAILocationSensor::WriteEvent ( this->mInput, longitude, latitude, altitude, hAccuracy, vAccuracy, speed );
 	}
+	this->mMutex.Unlock();
 }
 
 //----------------------------------------------------------------//
 void MOAIInputMgr::EnqueuePointerEvent ( u8 deviceID, u8 sensorID, int x, int y ) {
-
+	this->mMutex.Lock();
 	if ( this->CheckSensor ( deviceID, sensorID, MOAISensor::POINTER )) {
 		this->WriteEventHeader ( deviceID, sensorID, MOAISensor::POINTER );
 		MOAIPointerSensor::WriteEvent ( this->mInput, x, y );
 	}
+	this->mMutex.Unlock();
 }
 
 //----------------------------------------------------------------//
 void MOAIInputMgr::EnqueueTouchEvent ( u8 deviceID, u8 sensorID, u32 touchID, bool down, float x, float y ) {
-
+	this->mMutex.Lock();
 	if ( this->CheckSensor ( deviceID, sensorID, MOAISensor::TOUCH )) {
 		this->WriteEventHeader ( deviceID, sensorID, MOAISensor::TOUCH );
 		float time = ( float )ZLDeviceTime::GetTimeInSeconds ();
 		MOAITouchSensor::WriteEvent ( this->mInput, touchID, down, x, y, time );
 	}
+	this->mMutex.Unlock();
 }
 
 //----------------------------------------------------------------//
 void MOAIInputMgr::EnqueueTouchEventCancel ( u8 deviceID, u8 sensorID ) {
-
+	this->mMutex.Lock();
 	if ( this->CheckSensor ( deviceID, sensorID, MOAISensor::TOUCH )) {
 		this->WriteEventHeader ( deviceID, sensorID, MOAISensor::TOUCH );
 		MOAITouchSensor::WriteEventCancel ( this->mInput );
 	}
+	this->mMutex.Unlock();
 }
 
 //----------------------------------------------------------------//
 void MOAIInputMgr::EnqueueWheelEvent ( u8 deviceID, u8 sensorID, float value ) {
-
+	this->mMutex.Lock();
 	if ( this->CheckSensor ( deviceID, sensorID, MOAISensor::WHEEL )) {
 		this->WriteEventHeader ( deviceID, sensorID, MOAISensor::WHEEL );
 		MOAIWheelSensor::WriteEvent ( this->mInput, value );
 	}
+	this->mMutex.Unlock();
 }
 
 //----------------------------------------------------------------//
@@ -250,26 +262,32 @@ void MOAIInputMgr::SetSensor ( u8 deviceID, u8 sensorID, cc8* name, u32 type ) {
 
 //----------------------------------------------------------------//
 void MOAIInputMgr::Update () {
-
+	this->mMutex.Lock();
 	u32 total = this->mInput.GetCursor ();
 	this->Reset ();
-
+	__android_log_write(ANDROID_LOG_ERROR, "INPUT", "Checking Input");
 	while ( (this->mInput.GetCursor () + 3) < total ) {
 		u8 deviceID		= this->mInput.Read < u8 >( 0 );
 		u8 sensorID		= this->mInput.Read < u8 >( 0 );
-		//u32 type		= ( u32 )this->mInput.Read < u8 >();
-		this->mInput.Read < u8 >( 0 );
-		
 		MOAISensor* sensor = this->GetSensor ( deviceID, sensorID );
-		sensor->HandleEvent ( this->mInput );
+		if (sensor == 0) {
+			__android_log_write(ANDROID_LOG_ERROR, "INPUT", "NO SENSOR FOUND!");
+			this->mInput.Seek(0, SEEK_SET);
+			this->mMutex.Unlock();
+			return;
+		}
+		if ( (this->mInput.GetCursor() + sensor->EventSize()) <= total ) {
+			sensor->HandleEvent ( this->mInput );
+		} else {
+			__android_log_write(ANDROID_LOG_ERROR, "INPUT", "Not enough data!");
+		}
 	}
 	this->mInput.Seek ( 0, SEEK_SET );
+	this->mMutex.Unlock();
 }
 
 //----------------------------------------------------------------//
 void MOAIInputMgr::WriteEventHeader ( u8 deviceID, u8 sensorID, u32 type ) {
-
 	this->mInput.Write < u8 >(( u8 )deviceID );
 	this->mInput.Write < u8 >(( u8 )sensorID );
-	this->mInput.Write < u8 >(( u8 )type );
 }
