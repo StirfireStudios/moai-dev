@@ -1,8 +1,6 @@
 // Copyright (c) 2010-2011 Zipline Games, Inc. All Rights Reserved.
 // http://getmoai.com
 
-#include <android/log.h>
-
 #include "pch.h"
 
 #include <moai-sim/MOAIButtonSensor.h>
@@ -265,22 +263,19 @@ void MOAIInputMgr::Update () {
 	this->mMutex.Lock();
 	u32 total = this->mInput.GetCursor ();
 	this->Reset ();
-	__android_log_write(ANDROID_LOG_ERROR, "INPUT", "Checking Input");
 	while ( (this->mInput.GetCursor () + 3) < total ) {
 		u8 deviceID		= this->mInput.Read < u8 >( 0 );
 		u8 sensorID		= this->mInput.Read < u8 >( 0 );
 		MOAISensor* sensor = this->GetSensor ( deviceID, sensorID );
 		if (sensor == 0) {
-			__android_log_write(ANDROID_LOG_ERROR, "INPUT", "NO SENSOR FOUND!");
+
 			this->mInput.Seek(0, SEEK_SET);
 			this->mMutex.Unlock();
 			return;
 		}
 		if ( (this->mInput.GetCursor() + sensor->EventSize()) <= total ) {
 			sensor->HandleEvent ( this->mInput );
-		} else {
-			__android_log_write(ANDROID_LOG_ERROR, "INPUT", "Not enough data!");
-		}
+		} 
 	}
 	this->mInput.Seek ( 0, SEEK_SET );
 	this->mMutex.Unlock();
